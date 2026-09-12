@@ -1,0 +1,12 @@
+{
+  "name": "mobixia-mobile-accessories",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node start.js",
+    "dev": "node start.js",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "seed": "cd backend && node prisma/seed.js"
+  }
+}

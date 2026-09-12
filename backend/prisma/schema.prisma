@@ -1,0 +1,363 @@
+// Prisma schema for Mobile Accessories Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String           @unique
+  description String?
+  is_system   Boolean          @default(false)
+  users       User[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id        Int              @id @default(autoincrement())
+  module    String           // products, orders, inventory, customers, marketing, reviews, cms, reports, settings, staff, audit
+  action    String           // view, create, edit, delete
+  roles     RolePermission[]
+  createdAt DateTime         @default(now())
+
+  @@unique([module, action])
+}
+
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  role_id      Int
+  permission_id Int
+  role         Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, permission_id])
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  mobile        String?        @unique
+  password_hash String
+  role_id       Int
+  role          Role           @relation(fields: [role_id], references: [id])
+  status        String         @default("ACTIVE") // ACTIVE, BLOCKED
+  avatar        String?
+  addresses     Address[]
+  orders        Order[]
+  reviews       Review[]
+  wishlists     Wishlist[]
+  audit_logs    AuditLog[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name       String
+  phone      String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  pincode    String
+  is_default Boolean  @default(false)
+  type       String   @default("HOME") // HOME, WORK, OTHER
+  orders     Order[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  parent_id   Int?
+  parent      Category?  @relation("SubCategories", fields: [parent_id], references: [id])
+  children    Category[] @relation("SubCategories")
+  name        String
+  slug        String     @unique
+  image       String?
+  sort_order  Int        @default(0)
+  status      String     @default("ACTIVE") // ACTIVE, INACTIVE
+  is_featured Boolean    @default(false)
+  products    Product[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Brand {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  logo        String?
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id             Int              @id @default(autoincrement())
+  category_id    Int
+  category       Category         @relation(fields: [category_id], references: [id])
+  brand_id       Int?
+  brand          Brand?           @relation(fields: [brand_id], references: [id])
+  name           String
+  slug           String           @unique
+  description    String?          @db.Text
+  specs_json     String?          @db.Text // JSON string for technical specifications
+  status         String           @default("ACTIVE") // ACTIVE, INACTIVE, DRAFT
+  is_featured    Boolean          @default(false)
+  is_best_seller Boolean          @default(false)
+  views_count    Int              @default(0)
+  created_by     Int?
+  variants       ProductVariant[]
+  images         ProductImage[]
+  reviews        Review[]
+  wishlists      Wishlist[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model ProductVariant {
+  id            Int          @id @default(autoincrement())
+  product_id    Int
+  product       Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  sku           String       @unique
+  color         String?
+  color_code    String?      // e.g. #000000
+  size_or_model String?      // e.g. iPhone 15 Pro Max, 65W, 10000mAh
+  price         Float
+  mrp           Float
+  stock         Int          @default(0)
+  image         String?
+  cart_items    CartItem[]
+  order_items   OrderItem[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model ProductImage {
+  id         Int      @id @default(autoincrement())
+  product_id Int
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  variant_id Int?
+  url        String
+  is_primary Boolean  @default(false)
+  sort_order Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Cart {
+  id         Int        @id @default(autoincrement())
+  user_id    Int?       @unique
+  session_id String?    @unique
+  items      CartItem[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model CartItem {
+  id         Int            @id @default(autoincrement())
+  cart_id    Int
+  cart       Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  variant_id Int
+  variant    ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
+  qty        Int            @default(1)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([cart_id, variant_id])
+}
+
+model Order {
+  id             Int                  @id @default(autoincrement())
+  order_no       String               @unique
+  user_id        Int?
+  user           User?                @relation(fields: [user_id], references: [id])
+  guest_email    String?
+  guest_phone    String?
+  guest_name     String?
+  address_id     Int?
+  address        Address?             @relation(fields: [address_id], references: [id])
+  shipping_info  String?              @db.Text // JSON snapshot of shipping address
+  status         String               @default("PLACED") // PLACED, CONFIRMED, PACKED, SHIPPED, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, RETURNED
+  payment_method String               @default("COD") // COD, RAZORPAY
+  payment_status String               @default("PENDING") // PENDING, PAID, REFUNDED, FAILED
+  payment_id     String?              // Razorpay payment ID
+  subtotal       Float
+  discount       Float                @default(0)
+  shipping_fee   Float                @default(0)
+  tax            Float                @default(0)
+  total          Float
+  coupon_code    String?
+  courier_name   String?
+  tracking_id    String?
+  tracking_url   String?
+  cancel_reason  String?
+  return_reason  String?
+  items          OrderItem[]
+  status_history OrderStatusHistory[]
+  reviews        Review[]
+  placed_at      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+}
+
+model OrderItem {
+  id                    Int            @id @default(autoincrement())
+  order_id              Int
+  order                 Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  variant_id            Int?
+  variant               ProductVariant? @relation(fields: [variant_id], references: [id], onDelete: SetNull)
+  qty                   Int
+  price                 Float
+  mrp                   Float?
+  product_name_snapshot String
+  variant_snapshot      String?
+  image_snapshot        String?
+}
+
+model OrderStatusHistory {
+  id         Int      @id @default(autoincrement())
+  order_id   Int
+  order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  status     String
+  notes      String?
+  changed_by String?  // User name or 'SYSTEM'
+  changed_at DateTime @default(now())
+}
+
+model Coupon {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique
+  type            String   @default("PERCENTAGE") // PERCENTAGE, FLAT
+  value           Float
+  min_order_value Float    @default(0)
+  max_discount    Float?
+  usage_limit     Int      @default(100)
+  used_count      Int      @default(0)
+  start_date      DateTime?
+  end_date        DateTime?
+  status          String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Banner {
+  id          Int       @id @default(autoincrement())
+  title       String
+  subtitle    String?
+  image       String
+  link        String?
+  position    String    @default("HERO") // HERO, PROMO_TOP, PROMO_STRIP
+  sort_order  Int       @default(0)
+  status      String    @default("ACTIVE") // ACTIVE, INACTIVE
+  start_date  DateTime?
+  end_date    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  product_id  Int
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  order_id    Int?
+  order       Order?   @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  rating      Int      @default(5)
+  title       String?
+  comment     String   @db.Text
+  images_json String?  @db.Text // JSON array of image URLs
+  status      String   @default("APPROVED") // PENDING, APPROVED, REJECTED
+  admin_reply String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Wishlist {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product_id Int
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([user_id, product_id])
+}
+
+model CmsPage {
+  id               Int      @id @default(autoincrement())
+  slug             String   @unique
+  title            String
+  content_html     String   @db.Text
+  meta_title       String?
+  meta_description String?
+  updated_by       String?
+  updatedAt        DateTime @updatedAt
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   @db.Text
+  group     String   @default("GENERAL") // GENERAL, SHIPPING, TAX
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentCredential {
+  id                       Int      @id @default(autoincrement())
+  provider                 String   @default("RAZORPAY")
+  mode                     String   @default("TEST") // TEST, LIVE
+  key_id                   String
+  key_secret_encrypted     String   @db.Text
+  webhook_secret_encrypted String?  @db.Text
+  is_active                Boolean  @default(true)
+  updated_by               String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  @@unique([provider, mode])
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  user_id     Int?
+  user        User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  module      String
+  action      String
+  description String   @db.Text
+  ip_address  String?
+  created_at  DateTime @default(now())
+}
+
+model ContactEnquiry {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String
+  phone      String?
+  subject    String?
+  message    String   @db.Text
+  status     String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  createdAt  DateTime @default(now())
+}
+
+model NotificationLog {
+  id        Int      @id @default(autoincrement())
+  user_id   Int?
+  type      String   // ORDER_PLACED, ORDER_SHIPPED, OTP, etc.
+  channel   String   // EMAIL, SMS
+  recipient String
+  content   String   @db.Text
+  status    String   @default("SENT")
+  sent_at   DateTime @default(now())
+}

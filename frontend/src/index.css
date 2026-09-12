@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply font-sans bg-[#f8fafc] text-slate-900 min-h-screen antialiased selection:bg-[#0072ff] selection:text-white;
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+  #root {
+    min-height: 100vh;
+    background-color: #f8fafc;
+  }
+}
+
+/* Custom modern scrollbar matching clean light theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Light Theme Card and Panel helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 114, 255, 0.4);
+  box-shadow: 0 10px 30px -5px rgba(0, 114, 255, 0.12);
+}
+
+/* Gradient text utility */
+.text-mobixia-gradient {
+  background: linear-gradient(135deg, #0f172a 20%, #0072ff 80%, #00c6ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-mobixia-x {
+  background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}

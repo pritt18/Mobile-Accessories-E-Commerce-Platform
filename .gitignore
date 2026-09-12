@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
+dist/
+frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Database journals
+*.db-journal
+*.sqlite-journal
+
+# OS files
+.DS_Store
+Thumbs.db
+# Environment / secrets
+.env
+*.env
+backend/.env
+frontend/.env
+!.env.example
