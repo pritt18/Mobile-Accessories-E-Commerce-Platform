@@ -93,7 +93,7 @@ app.listen(PORT, () => {
   console.log(`🌐 API Base: http://localhost:${PORT}/api/v1`);
   console.log(`🗄️ Database: MySQL mobixia_db (127.0.0.1:3306)`);
   console.log(`📧 Mailer: Gmail SMTP (pritamgangurde18@gmail.com)`);
-  console.log(`💳 Gateway: Razorpay Online (rzp_test_Tb3eJTFsLj1VR9)`);
+  console.log(`💳 Gateway: Razorpay Online (rzp_test_Tb6xiThrPT7xSc)`);
   console.log(`=========================================`);
 });
 

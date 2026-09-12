@@ -29,7 +29,25 @@ const submitContact = async (req, res) => {
   }
 };
 
+const getStoreSettings = async (req, res) => {
+  try {
+    const settings = await prisma.setting.findMany();
+    const map = {};
+    settings.forEach((s) => {
+      // Don't expose sensitive keys publicly
+      if (!s.key.includes('secret') && !s.key.includes('key_secret')) {
+        map[s.key] = s.value;
+      }
+    });
+    return successResponse(res, map);
+  } catch (err) {
+    return errorResponse(res, err.message, 500);
+  }
+};
+
 module.exports = {
   getCmsPage,
   submitContact,
+  getStoreSettings,
 };
+

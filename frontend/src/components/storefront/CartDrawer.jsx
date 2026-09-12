@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Tag, Check, ShieldCheck, Bookmark } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { formatCurrency } from '../../utils/formatters';
+import api from '../../services/api';
 
 export const CartDrawer = () => {
   const navigate = useNavigate();
@@ -27,6 +28,21 @@ export const CartDrawer = () => {
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
+  const [storeSettings, setStoreSettings] = useState({
+    shipping_free_threshold: 499,
+    shipping_standard_fee: 50,
+  });
+
+  useEffect(() => {
+    api.get('/cms/store-settings').then((res) => {
+      if (res.data?.success) {
+        setStoreSettings({
+          shipping_free_threshold: parseFloat(res.data.data?.shipping_free_threshold) || 499,
+          shipping_standard_fee: parseFloat(res.data.data?.shipping_standard_fee) ?? 50,
+        });
+      }
+    }).catch(() => {});
+  }, []);
 
   if (!isCartOpen) return null;
 
@@ -44,8 +60,8 @@ export const CartDrawer = () => {
     }
   };
 
-  const freeShippingThreshold = 499;
-  const shippingFee = subtotal >= freeShippingThreshold ? 0 : 50;
+  const freeShippingThreshold = storeSettings.shipping_free_threshold;
+  const shippingFee = subtotal >= freeShippingThreshold ? 0 : storeSettings.shipping_standard_fee;
   const amountNeededForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
   const finalTotal = Math.max(0, subtotal - discount) + (subtotal > 0 ? shippingFee : 0);
 

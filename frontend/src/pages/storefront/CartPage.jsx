@@ -39,10 +39,26 @@ export const CartPage = () => {
   const [couponSuccess, setCouponSuccess] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
-  // Free shipping threshold = ₹499
-  const freeShippingThreshold = 499;
+  const [storeSettings, setStoreSettings] = useState({
+    shipping_free_threshold: 499,
+    shipping_standard_fee: 50,
+  });
+
+  useEffect(() => {
+    api.get('/cms/store-settings').then((res) => {
+      if (res.data?.success) {
+        setStoreSettings({
+          shipping_free_threshold: parseFloat(res.data.data?.shipping_free_threshold) || 499,
+          shipping_standard_fee: parseFloat(res.data.data?.shipping_standard_fee) ?? 50,
+        });
+      }
+    }).catch(() => {});
+  }, []);
+
+  // Dynamic Free shipping threshold
+  const freeShippingThreshold = storeSettings.shipping_free_threshold;
   const isFreeShipping = subtotal >= freeShippingThreshold;
-  const shippingFee = isFreeShipping ? 0 : 50;
+  const shippingFee = isFreeShipping ? 0 : storeSettings.shipping_standard_fee;
   const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
   const remainingForFree = Math.max(0, freeShippingThreshold - subtotal);
   const finalTotal = Math.max(0, subtotal - discount) + (subtotal > 0 ? shippingFee : 0);

@@ -4,6 +4,7 @@ const orderCtrl = require('../controllers/order.controller');
 const { authenticate, optionalAuth } = require('../middleware/auth');
 
 // Allow checkout as guest or authenticated customer
+router.post('/', optionalAuth, orderCtrl.createOrder);
 router.post('/checkout', optionalAuth, orderCtrl.createOrder);
 router.post('/verify-payment', orderCtrl.verifyPayment);
 

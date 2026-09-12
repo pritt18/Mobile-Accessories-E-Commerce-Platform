@@ -5,17 +5,37 @@ const { sendNotification } = require('../utils/mailer');
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
 
-let razorpayClient = null;
-if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+const getRazorpayConfig = async () => {
+  let keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_Tb6xiThrPT7xSc';
+  let keySecret = process.env.RAZORPAY_KEY_SECRET || 'SR1SPVz7yMiNPmaFx8v1COuk';
+
   try {
-    razorpayClient = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
+    const activeSetting = await prisma.setting.findUnique({ where: { key: 'payment_razorpay_mode' } }).catch(() => null);
+    const mode = activeSetting?.value || 'TEST';
+    const cred = await prisma.paymentCredential.findFirst({
+      where: { provider: 'RAZORPAY', mode, is_active: true },
+    }).catch(() => null);
+
+    if (cred && cred.key_id && cred.key_secret_encrypted) {
+      const { decryptSecret } = require('../config/security');
+      keyId = cred.key_id;
+      keySecret = decryptSecret(cred.key_secret_encrypted);
+    }
   } catch (e) {
-    console.warn('[RAZORPAY] Init failed:', e.message);
+    console.warn('[RAZORPAY] Fallback to process.env credentials:', e.message);
   }
-}
+
+  let client = null;
+  if (keyId && keySecret) {
+    try {
+      client = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    } catch (e) {
+      console.warn('[RAZORPAY] Client instantiation failed:', e.message);
+    }
+  }
+
+  return { client, keyId, keySecret };
+};
 
 /**
  * Generate unique human-readable Order Number: e.g. VOR-2609-1234
@@ -121,11 +141,17 @@ const createOrder = async (req, res) => {
       }
     }
 
-    // Shipping calculation:
-    // If delivery slot speed is EXPRESS, flat ₹49.
-    // If STANDARD, Free shipping above ₹499, else ₹50.
+    // Dynamic Shipping calculation based on Admin Configuration Settings
+    const freeThresholdSetting = await prisma.setting.findUnique({ where: { key: 'shipping_free_threshold' } }).catch(() => null);
+    const standardFeeSetting = await prisma.setting.findUnique({ where: { key: 'shipping_standard_fee' } }).catch(() => null);
+    const expressFeeSetting = await prisma.setting.findUnique({ where: { key: 'shipping_express_fee' } }).catch(() => null);
+
+    const freeThreshold = freeThresholdSetting ? parseFloat(freeThresholdSetting.value) : 499;
+    const standardFee = standardFeeSetting ? parseFloat(standardFeeSetting.value) : 50;
+    const expressFee = expressFeeSetting ? parseFloat(expressFeeSetting.value) : 49;
+
     const isExpress = deliverySlot && deliverySlot.speed === 'EXPRESS';
-    const shippingFee = isExpress ? 49 : (subtotal >= 499 ? 0 : 50);
+    const shippingFee = isExpress ? expressFee : (subtotal >= freeThreshold ? 0 : standardFee);
 
     // GST Tax calculation: 18% included
     const taxable = Math.max(0, subtotal - discount);
@@ -260,10 +286,11 @@ const createOrder = async (req, res) => {
     // If online payment (Razorpay), prepare gateway details
     let razorpayPayload = null;
     if (paymentMethod === 'RAZORPAY') {
+      const { client, keyId } = await getRazorpayConfig();
       let rzpOrderId = null;
-      if (razorpayClient) {
+      if (client) {
         try {
-          const rzpOrder = await razorpayClient.orders.create({
+          const rzpOrder = await client.orders.create({
             amount: Math.round(newOrder.total * 100), // in paise
             currency: 'INR',
             receipt: newOrder.order_no,
@@ -279,7 +306,7 @@ const createOrder = async (req, res) => {
         orderId: rzpOrderId,
         amount: Math.round(newOrder.total * 100), // in paise
         currency: 'INR',
-        keyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_Tb3eJTFsLj1VR9',
+        keyId: keyId,
         name: 'Mobixia Mobile Accessories',
         description: `Order #${newOrder.order_no}`,
       };
@@ -492,8 +519,27 @@ const verifyPayment = async (req, res) => {
   try {
     const { orderId, razorpayPaymentId, razorpayOrderId, razorpaySignature } = req.body;
 
+    if (!orderId || isNaN(parseInt(orderId))) {
+      return errorResponse(res, 'Valid orderId is required', 400);
+    }
+
     const order = await prisma.order.findUnique({ where: { id: parseInt(orderId) } });
     if (!order) return errorResponse(res, 'Order not found', 404);
+
+    // Cryptographic signature verification if signature is provided
+    const { keySecret } = await getRazorpayConfig();
+    if (razorpaySignature && razorpayOrderId && razorpayPaymentId && keySecret) {
+      const expectedSignature = crypto
+        .createHmac('sha256', keySecret)
+        .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+        .digest('hex');
+
+      if (expectedSignature !== razorpaySignature) {
+        console.warn(`[RAZORPAY] Signature mismatch for Order #${order.order_no}`);
+        return errorResponse(res, 'Payment signature verification failed', 400);
+      }
+      console.log(`[RAZORPAY] Signature successfully verified for Order #${order.order_no}`);
+    }
 
     // Update order status to PAID and CONFIRMED
     const updated = await prisma.order.update({

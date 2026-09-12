@@ -56,7 +56,7 @@ export const OrderConfirmationPage = () => {
 
   const handleDownloadInvoice = () => {
     if (order?.id) {
-      window.open(`http://localhost:5000/api/v1/orders/${order.id}/invoice`, '_blank');
+      window.open(`/api/v1/orders/${order.id}/invoice`, '_blank');
     }
   };
 

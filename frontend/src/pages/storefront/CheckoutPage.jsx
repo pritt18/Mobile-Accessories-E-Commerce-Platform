@@ -63,9 +63,32 @@ export const CheckoutPage = () => {
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
   const [pendingOrderData, setPendingOrderData] = useState(null);
 
-  // Shipping Fee Calculation
+  const [storeSettings, setStoreSettings] = useState({
+    shipping_free_threshold: 499,
+    shipping_standard_fee: 50,
+    shipping_express_fee: 49,
+    shipping_cod_fee: 0,
+  });
+
+  useEffect(() => {
+    api.get('/cms/store-settings').then((res) => {
+      if (res.data?.success) {
+        setStoreSettings({
+          shipping_free_threshold: parseFloat(res.data.data?.shipping_free_threshold) || 499,
+          shipping_standard_fee: parseFloat(res.data.data?.shipping_standard_fee) ?? 50,
+          shipping_express_fee: parseFloat(res.data.data?.shipping_express_fee) ?? 49,
+          shipping_cod_fee: parseFloat(res.data.data?.shipping_cod_fee) ?? 0,
+        });
+      }
+    }).catch(() => {});
+  }, []);
+
+  // Dynamic Shipping Fee Calculation
   const isExpress = deliverySpeed === 'EXPRESS';
-  const shippingFee = isExpress ? 49 : (subtotal >= 499 ? 0 : 50);
+  const freeThreshold = storeSettings.shipping_free_threshold;
+  const standardFee = storeSettings.shipping_standard_fee;
+  const expressFee = storeSettings.shipping_express_fee;
+  const shippingFee = isExpress ? expressFee : (subtotal >= freeThreshold ? 0 : standardFee);
   const finalTotal = Math.max(0, subtotal - discount) + (subtotal > 0 ? shippingFee : 0);
 
   // Calculate dynamic estimated delivery dates
@@ -90,20 +113,25 @@ export const CheckoutPage = () => {
       setGuestEmail(user.email || '');
       setGuestPhone(user.mobile || '');
 
-      api.get('/auth/addresses').then((res) => {
-        if (res.data?.success && res.data.data.length > 0) {
-          setAddresses(res.data.data);
-          const def = res.data.data.find((a) => a.is_default) || res.data.data[0];
-          setSelectedAddressId(def.id);
-          setShowNewAddressForm(false);
-          // Auto check pincode serviceability for saved address
-          if (def.pincode) {
-            validatePincode(def.pincode);
+      api.get('/auth/addresses')
+        .then((res) => {
+          if (res.data?.success && res.data.data.length > 0) {
+            setAddresses(res.data.data);
+            const def = res.data.data.find((a) => a.is_default) || res.data.data[0];
+            setSelectedAddressId(def.id);
+            setShowNewAddressForm(false);
+            // Auto check pincode serviceability for saved address
+            if (def.pincode) {
+              validatePincode(def.pincode);
+            }
+          } else {
+            setShowNewAddressForm(true);
           }
-        } else {
+        })
+        .catch(() => {
+          setAddresses([]);
           setShowNewAddressForm(true);
-        }
-      });
+        });
     } else {
       setShowNewAddressForm(true);
     }
@@ -254,7 +282,7 @@ export const CheckoutPage = () => {
           if (isLoaded && window.Razorpay) {
             const razorpayConfig = res.data.data.razorpay;
             const options = {
-              key: razorpayConfig?.keyId || 'rzp_test_Tb3eJTFsLj1VR9',
+              key: razorpayConfig?.keyId || 'rzp_test_Tb6xiThrPT7xSc',
               order_id: razorpayConfig?.orderId || undefined,
               amount: Math.round(orderData.total * 100),
               currency: 'INR',
@@ -676,7 +704,7 @@ export const CheckoutPage = () => {
                   </p>
                 </div>
                 <div className="text-xs font-bold text-emerald-600">
-                  {subtotal >= 499 ? 'FREE Delivery' : '₹50 Delivery Fee'}
+                  {subtotal >= freeThreshold ? 'FREE Delivery' : `₹${standardFee} Delivery Fee`}
                 </div>
               </div>
 
@@ -712,7 +740,7 @@ export const CheckoutPage = () => {
                   </p>
                 </div>
                 <div className="text-xs font-black text-amber-600">
-                  ₹49 Priority Fee
+                  ₹{expressFee} Priority Fee
                 </div>
               </div>
             </div>

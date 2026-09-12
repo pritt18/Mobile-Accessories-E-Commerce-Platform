@@ -12,6 +12,8 @@ export const SettingsAdmin = () => {
     company_gstin: '',
     shipping_free_threshold: '499',
     shipping_standard_fee: '50',
+    shipping_express_fee: '49',
+    shipping_cod_fee: '0',
   });
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState('');
@@ -116,29 +118,61 @@ export const SettingsAdmin = () => {
           </div>
         </div>
 
-        {/* Shipping & Thresholds */}
+        {/* Shipping & Delivery Controls */}
         <div className="p-6 rounded-3xl bg-[#11141d] border border-gray-800 space-y-4">
-          <h2 className="text-base font-bold text-white">Shipping & Delivery Cutoffs</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="flex items-center justify-between">
             <div>
-              <label className="block font-bold text-gray-400 mb-1">Free Shipping Threshold (?)</label>
-              <input
-                type="number"
-                value={settings.shipping_free_threshold}
-                onChange={(e) => handleChange('shipping_free_threshold', e.target.value)}
-                className="w-full h-10 px-3 bg-gray-900 border border-gray-700 rounded-xl text-white"
-              />
-              <span className="text-[10px] text-gray-500 mt-1 block">Orders equal or above this get free shipping.</span>
+              <h2 className="text-base font-bold text-white">Shipping & Delivery Fees Management</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Control customer shipping charges, express air surcharges, and free delivery qualifiers</p>
             </div>
-            <div>
-              <label className="block font-bold text-gray-400 mb-1">Standard Delivery Fee (?)</label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div className="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 space-y-2">
+              <label className="block font-bold text-gray-300">Free Delivery Threshold (₹)</label>
               <input
                 type="number"
-                value={settings.shipping_standard_fee}
-                onChange={(e) => handleChange('shipping_standard_fee', e.target.value)}
-                className="w-full h-10 px-3 bg-gray-900 border border-gray-700 rounded-xl text-white"
+                min="0"
+                value={settings.shipping_free_threshold || '499'}
+                onChange={(e) => handleChange('shipping_free_threshold', e.target.value)}
+                className="w-full h-10 px-3 bg-gray-950 border border-gray-700 rounded-xl text-white font-bold"
               />
-              <span className="text-[10px] text-gray-500 mt-1 block">Applied to orders below threshold.</span>
+              <span className="text-[10px] text-gray-500 block">Orders equal or above this get 100% free standard shipping.</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 space-y-2">
+              <label className="block font-bold text-gray-300">Standard Delivery Fee (₹)</label>
+              <input
+                type="number"
+                min="0"
+                value={settings.shipping_standard_fee || '50'}
+                onChange={(e) => handleChange('shipping_standard_fee', e.target.value)}
+                className="w-full h-10 px-3 bg-gray-950 border border-gray-700 rounded-xl text-white font-bold"
+              />
+              <span className="text-[10px] text-gray-500 block">Applied when order subtotal is below the free threshold.</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 space-y-2">
+              <label className="block font-bold text-gray-300">Express Next-Day Air Fee (₹)</label>
+              <input
+                type="number"
+                min="0"
+                value={settings.shipping_express_fee || '49'}
+                onChange={(e) => handleChange('shipping_express_fee', e.target.value)}
+                className="w-full h-10 px-3 bg-gray-950 border border-gray-700 rounded-xl text-white font-bold"
+              />
+              <span className="text-[10px] text-gray-500 block">Charged when customer selects Priority Air Next-Day delivery.</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 space-y-2">
+              <label className="block font-bold text-gray-300">COD Extra Handling Fee (₹)</label>
+              <input
+                type="number"
+                min="0"
+                value={settings.shipping_cod_fee || '0'}
+                onChange={(e) => handleChange('shipping_cod_fee', e.target.value)}
+                className="w-full h-10 px-3 bg-gray-950 border border-gray-700 rounded-xl text-white font-bold"
+              />
+              <span className="text-[10px] text-gray-500 block">Optional surcharge for Cash on Delivery orders (₹0 for none).</span>
             </div>
           </div>
         </div>
