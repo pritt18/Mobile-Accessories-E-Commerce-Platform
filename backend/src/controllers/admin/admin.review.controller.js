@@ -2,6 +2,8 @@ const prisma = require('../../config/db');
 const { successResponse, errorResponse } = require('../../utils/response');
 const { logAuditAction } = require('../../middleware/audit');
 
+const products = require('../../data/products.json');
+
 const getAdminReviews = async (req, res) => {
   try {
     const { status, page = 1, limit = 20 } = req.query;
@@ -17,7 +19,6 @@ const getAdminReviews = async (req, res) => {
       prisma.review.findMany({
         where,
         include: {
-          product: { select: { id: true, name: true, slug: true } },
           user: { select: { id: true, name: true, email: true } },
         },
         orderBy: { createdAt: 'desc' },
@@ -26,7 +27,15 @@ const getAdminReviews = async (req, res) => {
       }),
     ]);
 
-    return successResponse(res, reviews, 'Reviews retrieved', 200, {
+    const formatted = reviews.map((r) => {
+      const prod = products.find((p) => p.id === r.product_id);
+      return {
+        ...r,
+        product: prod ? { id: prod.id, name: prod.name, slug: prod.slug } : { id: r.product_id, name: 'Accessories Product', slug: 'product' }
+      };
+    });
+
+    return successResponse(res, formatted, 'Reviews retrieved', 200, {
       total,
       page: pageNum,
       limit: take,
