@@ -53,9 +53,7 @@ model User {
   avatar        String?
   addresses     Address[]
   orders        Order[]
-  reviews       Review[]
   wishlists     Wishlist[]
-  audit_logs    AuditLog[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
@@ -128,7 +126,6 @@ model Order {
   return_reason  String?
   items          OrderItem[]
   status_history OrderStatusHistory[]
-  reviews        Review[]
   placed_at      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
 }
@@ -173,38 +170,6 @@ model Coupon {
   updatedAt       DateTime  @updatedAt
 }
 
-model Banner {
-  id         Int       @id @default(autoincrement())
-  title      String
-  subtitle   String?
-  image      String
-  link       String?
-  position   String    @default("HERO") // HERO, PROMO_TOP, PROMO_STRIP
-  sort_order Int       @default(0)
-  status     String    @default("ACTIVE") // ACTIVE, INACTIVE
-  start_date DateTime?
-  end_date   DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-}
-
-model Review {
-  id          Int      @id @default(autoincrement())
-  product_id  Int
-  user_id     Int
-  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  order_id    Int?
-  order       Order?   @relation(fields: [order_id], references: [id], onDelete: SetNull)
-  rating      Int      @default(5)
-  title       String?
-  comment     String   @db.Text
-  images_json String?  @db.Text // JSON array of image URLs
-  status      String   @default("APPROVED") // PENDING, APPROVED, REJECTED
-  admin_reply String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
 model Wishlist {
   id         Int      @id @default(autoincrement())
   user_id    Int
@@ -213,17 +178,6 @@ model Wishlist {
   createdAt  DateTime @default(now())
 
   @@unique([user_id, product_id])
-}
-
-model CmsPage {
-  id               Int      @id @default(autoincrement())
-  slug             String   @unique
-  title            String
-  content_html     String   @db.Text
-  meta_title       String?
-  meta_description String?
-  updated_by       String?
-  updatedAt        DateTime @updatedAt
 }
 
 model Setting {
@@ -249,17 +203,6 @@ model PaymentCredential {
   @@unique([provider, mode])
 }
 
-model AuditLog {
-  id          Int      @id @default(autoincrement())
-  user_id     Int?
-  user        User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  module      String
-  action      String
-  description String   @db.Text
-  ip_address  String?
-  created_at  DateTime @default(now())
-}
-
 model ContactEnquiry {
   id        Int      @id @default(autoincrement())
   name      String
@@ -269,15 +212,4 @@ model ContactEnquiry {
   message   String   @db.Text
   status    String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
   createdAt DateTime @default(now())
-}
-
-model NotificationLog {
-  id        Int      @id @default(autoincrement())
-  user_id   Int?
-  type      String   // ORDER_PLACED, ORDER_SHIPPED, OTP, etc.
-  channel   String   // EMAIL, SMS
-  recipient String
-  content   String   @db.Text
-  status    String   @default("SENT")
-  sent_at   DateTime @default(now())
 }

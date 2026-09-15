@@ -19,7 +19,6 @@ const getDashboardStats = async (req, res) => {
       newCustomersToday,
       totalCustomers,
       recentOrders,
-      recentReviews,
       orderStatusCounts,
     ] = await Promise.all([
       prisma.order.count({ where: { placed_at: { gte: today } } }),
@@ -43,18 +42,13 @@ const getDashboardStats = async (req, res) => {
           items: true,
         },
       }),
-      prisma.review.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          user: { select: { name: true, avatar: true } },
-        },
-      }),
       prisma.order.groupBy({
         by: ['status'],
         _count: { id: true },
       }),
     ]);
+
+    const recentReviews = [];
 
     // Generate 7-day revenue chart data
     const last7Days = [];

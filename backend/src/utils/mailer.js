@@ -217,17 +217,15 @@ const sendNotification = async ({ userId, type, channel = 'EMAIL', recipient, co
       }
     }
 
-    // Log to MySQL notificationLog table
-    const log = await prisma.notificationLog.create({
-      data: {
-        user_id: userId || null,
-        type,
-        channel,
-        recipient,
-        content,
-        status: emailSent ? 'DELIVERED' : 'SENT',
-      },
-    });
+    // Lightweight log without DB table storage
+    const log = {
+      type,
+      channel,
+      recipient,
+      status: emailSent ? 'DELIVERED' : 'SENT',
+      sent_at: new Date(),
+    };
+    console.log(`[NOTIFICATION] Channel: ${channel} | Recipient: ${recipient} | Status: ${log.status}`);
 
     return log;
   } catch (err) {

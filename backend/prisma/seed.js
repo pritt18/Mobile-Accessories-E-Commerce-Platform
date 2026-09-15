@@ -20,19 +20,12 @@ async function main() {
   console.log('🌱 Seeding clean database with authentic catalog & configuration...');
 
   // 1. Clean old mock clutter
-  await prisma.review.deleteMany({});
   await prisma.orderStatusHistory.deleteMany({});
   await prisma.orderItem.deleteMany({});
   await prisma.order.deleteMany({});
-  await prisma.notificationLog.deleteMany({});
-  await prisma.auditLog.deleteMany({});
   await prisma.cartItem.deleteMany({});
   await prisma.cart.deleteMany({});
   await prisma.wishlist.deleteMany({});
-  await prisma.productImage.deleteMany({});
-  await prisma.productVariant.deleteMany({});
-  await prisma.product.deleteMany({});
-  await prisma.banner.deleteMany({});
 
   // 2. Roles
   const superAdminRole = await prisma.role.upsert({
@@ -563,42 +556,7 @@ async function main() {
     ],
   });
 
-  // 10. CMS Pages
-  const cmsPagesData = [
-    {
-      slug: 'about-us',
-      title: 'About Mobixia',
-      content_html: `<h2>Engineered for Modern Devices</h2><p>At Mobixia, we craft premium smartphone and tech accessories that combine minimalist industrial aesthetics with unyielding durability. From military-spec drop protection to high-efficiency GaN power delivery, every product in our catalog undergoes rigorous quality testing.</p><p>Headquartered in Mumbai, India, we ship nationwide with express door-to-door courier delivery and hassle-free warranty backing.</p>`,
-    },
-    {
-      slug: 'privacy-policy',
-      title: 'Privacy Policy',
-      content_html: `<h2>Your Privacy Matters</h2><p>We collect and utilize your personal information strictly for order processing, customer support, and tailored shopping experiences. We never sell or lease your personal data to third parties. All online payments are processed through RBI-authorized payment gateways under 256-bit SSL encryption.</p>`,
-    },
-    {
-      slug: 'terms-and-conditions',
-      title: 'Terms & Conditions',
-      content_html: `<h2>Terms of Service</h2><p>By browsing or purchasing from Mobixia, you agree to our standard terms of service. Products are subject to stock availability and prices may be updated without prior notice. Dispatched orders can be tracked in real-time through our order tracking portal.</p>`,
-    },
-    {
-      slug: 'shipping-policy',
-      title: 'Shipping & Delivery Policy',
-      content_html: `<h2>Fast & Reliable Express Shipping</h2><p>We offer <strong>Free Standard Shipping</strong> on all orders exceeding the configured threshold. Orders are typically processed and dispatched within 24 business hours. Estimated delivery timelines: Metro cities (1-3 business days), rest of India (3-5 business days).</p>`,
-    },
-    {
-      slug: 'refund-policy',
-      title: 'Refund & Return Policy',
-      content_html: `<h2>7-Day Hassle-Free Returns</h2><p>If you receive a defective or incompatible product, you can initiate a return or replacement request within 7 days of delivery directly through your account dashboard or order tracking page. Refunds are processed to original payment methods within 3-5 business days of return verification.</p>`,
-    },
-  ];
-
-  for (const p of cmsPagesData) {
-    await prisma.cmsPage.upsert({
-      where: { slug: p.slug },
-      update: {},
-      create: p,
-    });
-  }
+  // 10. CMS Pages (Handled statically in-memory for zero database storage/billing)
 
   // 11. Operational Settings (with dynamic Delivery Fees)
   const settingsData = [

@@ -55,11 +55,14 @@ const deleteCoupon = async (req, res) => {
   }
 };
 
+const { staticBanners } = require('../banner.controller');
+
 // --- Banners ---
+let adminBannersList = [...staticBanners];
+
 const getAdminBanners = async (req, res) => {
   try {
-    const banners = await prisma.banner.findMany({ orderBy: { sort_order: 'asc' } });
-    return successResponse(res, banners);
+    return successResponse(res, adminBannersList);
   } catch (err) {
     return errorResponse(res, err.message, 500);
   }
@@ -70,25 +73,17 @@ const createBanner = async (req, res) => {
     const { title, subtitle, image, link, position, sortOrder, status } = req.body;
     if (!title || !image) return errorResponse(res, 'Title and image are required', 400);
 
-    const banner = await prisma.banner.create({
-      data: {
-        title,
-        subtitle,
-        image,
-        link,
-        position: position || 'HERO',
-        sort_order: parseInt(sortOrder) || 0,
-        status: status || 'ACTIVE',
-      },
-    });
-
-    await logAuditAction({
-      userId: req.user.id,
-      module: 'marketing',
-      action: 'create_banner',
-      description: `Created promotional banner "${title}"`,
-      req,
-    });
+    const banner = {
+      id: Date.now(),
+      title,
+      subtitle,
+      image,
+      link,
+      position: position || 'HERO',
+      sort_order: parseInt(sortOrder) || 0,
+      status: status || 'ACTIVE',
+    };
+    adminBannersList.push(banner);
 
     return successResponse(res, banner, 'Banner created successfully', 201);
   } catch (err) {
@@ -99,7 +94,7 @@ const createBanner = async (req, res) => {
 const deleteBanner = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.banner.delete({ where: { id: parseInt(id) } });
+    adminBannersList = adminBannersList.filter((b) => b.id !== parseInt(id));
     return successResponse(res, null, 'Banner deleted');
   } catch (err) {
     return errorResponse(res, err.message, 500);

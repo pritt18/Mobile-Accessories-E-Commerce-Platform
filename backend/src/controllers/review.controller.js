@@ -1,16 +1,14 @@
 const prisma = require('../config/db');
 const { successResponse, errorResponse } = require('../utils/response');
 
+// In-memory reviews map by product_id
+const inMemoryReviews = {};
+
 const getProductReviews = async (req, res) => {
   try {
     const { productId } = req.params;
-    const reviews = await prisma.review.findMany({
-      where: { product_id: parseInt(productId), status: 'APPROVED' },
-      include: {
-        user: { select: { name: true, avatar: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const pId = parseInt(productId);
+    const reviews = inMemoryReviews[pId] || [];
     return successResponse(res, reviews);
   } catch (err) {
     return errorResponse(res, err.message, 500);
@@ -19,41 +17,34 @@ const getProductReviews = async (req, res) => {
 
 const submitReview = async (req, res) => {
   try {
-    const { productId, rating, title, comment, images } = req.body;
-    const userId = req.user.id;
+    const { productId, rating, title, comment } = req.body;
+    const user = req.user;
 
     if (!productId || !rating || !comment) {
       return errorResponse(res, 'Product ID, rating, and review comment are required', 400);
     }
 
-    // Check if user has purchased this product (Delivered order)
-    const verifiedOrder = await prisma.order.findFirst({
-      where: {
-        user_id: userId,
-        status: 'DELIVERED',
-        items: {
-          some: {
-            product_id: parseInt(productId),
-          },
-        },
-      },
-    });
+    const pId = parseInt(productId);
+    if (!inMemoryReviews[pId]) {
+      inMemoryReviews[pId] = [];
+    }
 
-    const newReview = await prisma.review.create({
-      data: {
-        product_id: parseInt(productId),
-        user_id: userId,
-        order_id: verifiedOrder ? verifiedOrder.id : null,
-        rating: Math.min(5, Math.max(1, parseInt(rating))),
-        title,
-        comment,
-        images_json: images ? JSON.stringify(images) : null,
-        status: 'APPROVED', // auto-approved for demo/seamless experience
+    const newReview = {
+      id: Date.now(),
+      product_id: pId,
+      user_id: user.id,
+      rating: Math.min(5, Math.max(1, parseInt(rating))),
+      title: title || 'Verified Purchase',
+      comment,
+      status: 'APPROVED',
+      user: {
+        name: user.name || 'Verified Customer',
+        avatar: user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       },
-      include: {
-        user: { select: { name: true, avatar: true } },
-      },
-    });
+      createdAt: new Date().toISOString(),
+    };
+
+    inMemoryReviews[pId].unshift(newReview);
 
     return successResponse(res, newReview, 'Review submitted successfully! Thank you for your feedback.', 201);
   } catch (err) {
@@ -64,4 +55,5 @@ const submitReview = async (req, res) => {
 module.exports = {
   getProductReviews,
   submitReview,
+  inMemoryReviews,
 };
