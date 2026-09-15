@@ -88,7 +88,7 @@ const generateAccessToken = (user) => {
       role: user.role?.name || user.role,
       name: user.name,
     },
-    process.env.JWT_SECRET || 'vortique_jwt_secret',
+    process.env.JWT_SECRET || 'mobixia_jwt_secret',
     { expiresIn: '7d' }
   );
 };
@@ -96,13 +96,13 @@ const generateAccessToken = (user) => {
 const generateRefreshToken = (user) => {
   return jwt.sign(
     { id: user.id },
-    process.env.JWT_REFRESH_SECRET || 'vortique_jwt_refresh_secret',
+    process.env.JWT_REFRESH_SECRET || 'mobixia_jwt_refresh_secret',
     { expiresIn: '30d' }
   );
 };
 
 const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET || 'vortique_jwt_secret');
+  return jwt.verify(token, process.env.JWT_SECRET || 'mobixia_jwt_secret');
 };
 
 module.exports = {

@@ -57,9 +57,9 @@ export const HomePage = () => {
 
   const heroBanners = banners.filter((b) => b.position === 'HERO');
   const activeHero = heroBanners[activeSlide] || {
-    title: 'Authentic Vortique Mobile Accessories',
+    title: 'Authentic Mobixia Mobile Accessories',
     subtitle: 'German Silicone iPhone Cases, 65W GaN Chargers & MagSafe Accessories',
-    image: 'https://vortique.in/images/20260909131205_1-1.JPG',
+    image: '/images/products/product_img_1.jpg',
     link: '/products',
   };
 

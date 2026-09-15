@@ -1,5 +1,5 @@
 // Prisma schema for Mobixia Mobile Accessories Platform
-// Product catalog is served via structured high-performance static dataset (vortique.in products)
+// Product catalog is served via structured high-performance static dataset
 
 generator client {
   provider = "prisma-client-js"

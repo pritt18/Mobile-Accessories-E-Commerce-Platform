@@ -11,14 +11,14 @@
     "reviewCount": 124,
     "inStock": true,
     "stock": 85,
-    "brand": "Vortique Sadgatih",
-    "primaryImage": "https://vortique.in/images/20260909131205_1-1.JPG",
+    "brand": "Mobixia Sadgatih",
+    "primaryImage": "/images/products/product_img_1.jpg",
     "images": [
-      "https://vortique.in/images/20260909131205_1-1.JPG",
-      "https://vortique.in/images/20260909131205_feature1_1-2.JPG",
-      "https://vortique.in/images/20260909131205_feature2_1-3.JPG",
-      "https://vortique.in/images/20260909131205_feature3_1-4.JPG",
-      "https://vortique.in/images/20260909131205_feature4_1-5.JPG"
+      "/images/products/product_img_1.jpg",
+      "/images/products/product_img_2.jpg",
+      "/images/products/product_img_3.jpg",
+      "/images/products/product_img_4.jpg",
+      "/images/products/product_img_5.jpg"
     ],
     "isFeatured": true,
     "isBestSeller": true,
@@ -35,28 +35,31 @@
         "id": 331,
         "color": "Crystal Clear",
         "model": "iPhone 17",
-        "sku": "VOR-CASE-33-CLR17",
+        "sku": "MBX-CASE-33-CLR17",
         "price": 259,
         "mrp": 999,
-        "stock": 30
+        "stock": 30,
+        "image": "/images/products/product_img_1.jpg"
       },
       {
         "id": 332,
         "color": "Crystal Clear",
         "model": "iPhone 16 Pro Max",
-        "sku": "VOR-CASE-33-CLR16PM",
+        "sku": "MBX-CASE-33-CLR16PM",
         "price": 259,
         "mrp": 999,
-        "stock": 25
+        "stock": 25,
+        "image": "/images/products/product_img_1.jpg"
       },
       {
         "id": 333,
         "color": "Smoky Black",
         "model": "iPhone 16 Pro",
-        "sku": "VOR-CASE-33-BLK16P",
+        "sku": "MBX-CASE-33-BLK16P",
         "price": 279,
         "mrp": 999,
-        "stock": 30
+        "stock": 30,
+        "image": "/images/products/product_img_1.jpg"
       }
     ]
   },
@@ -72,11 +75,11 @@
     "reviewCount": 86,
     "inStock": true,
     "stock": 40,
-    "brand": "Vortique Craft",
-    "primaryImage": "https://vortique.in/images/20260812191425_712SFJqKFCL._AC_UL480_FMwebp_QL65_[1].jpg",
+    "brand": "Mobixia Craft",
+    "primaryImage": "/images/products/product_img_6.jpg",
     "images": [
-      "https://vortique.in/images/20260812191425_712SFJqKFCL._AC_UL480_FMwebp_QL65_[1].jpg",
-      "https://vortique.in/images/cover.jpg"
+      "/images/products/product_img_6.jpg",
+      "/images/products/product_img_7.jpg"
     ],
     "isFeatured": true,
     "isBestSeller": false,
@@ -92,19 +95,21 @@
         "id": 81,
         "color": "Cognac Brown",
         "model": "Universal Fit",
-        "sku": "VOR-CASE-8-BRN",
+        "sku": "MBX-CASE-8-BRN",
         "price": 949,
         "mrp": 1899,
-        "stock": 20
+        "stock": 20,
+        "image": "/images/products/product_img_6.jpg"
       },
       {
         "id": 82,
         "color": "Midnight Black",
         "model": "Universal Fit",
-        "sku": "VOR-CASE-8-BLK",
+        "sku": "MBX-CASE-8-BLK",
         "price": 949,
         "mrp": 1899,
-        "stock": 20
+        "stock": 20,
+        "image": "/images/products/product_img_6.jpg"
       }
     ]
   },
@@ -120,12 +125,12 @@
     "reviewCount": 210,
     "inStock": true,
     "stock": 60,
-    "brand": "Vortique Power",
-    "primaryImage": "https://vortique.in/images/20260912133602_charger.jpg",
+    "brand": "Mobixia Power",
+    "primaryImage": "/images/products/product_img_8.jpg",
     "images": [
-      "https://vortique.in/images/20260912133602_charger.jpg",
-      "https://vortique.in/images/20260811002601_wall charger.webp",
-      "https://vortique.in/images/20260811004239_51fpGWaB-pL._AC_UY327_FMwebp_QL65_[1].jpg"
+      "/images/products/product_img_8.jpg",
+      "/images/products/product_img_9.webp",
+      "/images/products/product_img_10.jpg"
     ],
     "isFeatured": true,
     "isBestSeller": true,
@@ -141,19 +146,21 @@
         "id": 351,
         "color": "Glossy White",
         "model": "India 2-Pin Plug",
-        "sku": "VOR-CHG-35-WHT",
+        "sku": "MBX-CHG-35-WHT",
         "price": 1299,
         "mrp": 2499,
-        "stock": 35
+        "stock": 35,
+        "image": "/images/products/product_img_8.jpg"
       },
       {
         "id": 352,
         "color": "Matte Black",
         "model": "India 2-Pin Plug",
-        "sku": "VOR-CHG-35-BLK",
+        "sku": "MBX-CHG-35-BLK",
         "price": 1349,
         "mrp": 2499,
-        "stock": 25
+        "stock": 25,
+        "image": "/images/products/product_img_8.jpg"
       }
     ]
   },
@@ -169,11 +176,11 @@
     "reviewCount": 142,
     "inStock": true,
     "stock": 90,
-    "brand": "Vortique Power",
-    "primaryImage": "https://vortique.in/images/20260811002601_wall charger.webp",
+    "brand": "Mobixia Power",
+    "primaryImage": "/images/products/product_img_9.webp",
     "images": [
-      "https://vortique.in/images/20260811002601_wall charger.webp",
-      "https://vortique.in/images/20260912133602_charger.jpg"
+      "/images/products/product_img_9.webp",
+      "/images/products/product_img_8.jpg"
     ],
     "isFeatured": false,
     "isBestSeller": true,
@@ -188,10 +195,11 @@
         "id": 211,
         "color": "Alpine White",
         "model": "Standard Adapter",
-        "sku": "VOR-CHG-21-WHT",
+        "sku": "MBX-CHG-21-WHT",
         "price": 449,
         "mrp": 899,
-        "stock": 90
+        "stock": 90,
+        "image": "/images/products/product_img_9.webp"
       }
     ]
   },
@@ -207,11 +215,11 @@
     "reviewCount": 78,
     "inStock": true,
     "stock": 50,
-    "brand": "Vortique Power",
-    "primaryImage": "https://vortique.in/images/20260912133602_charger.jpg",
+    "brand": "Mobixia Power",
+    "primaryImage": "/images/products/product_img_8.jpg",
     "images": [
-      "https://vortique.in/images/20260912133602_charger.jpg",
-      "https://vortique.in/images/20260811004239_51fpGWaB-pL._AC_UY327_FMwebp_QL65_[1].jpg"
+      "/images/products/product_img_8.jpg",
+      "/images/products/product_img_10.jpg"
     ],
     "isFeatured": false,
     "isBestSeller": false,
@@ -226,10 +234,11 @@
         "id": 191,
         "color": "White & Red Accents",
         "model": "33W Flash Adapter",
-        "sku": "VOR-CHG-19",
+        "sku": "MBX-CHG-19",
         "price": 599,
         "mrp": 1299,
-        "stock": 50
+        "stock": 50,
+        "image": "/images/products/product_img_8.jpg"
       }
     ]
   },
@@ -245,11 +254,11 @@
     "reviewCount": 310,
     "inStock": true,
     "stock": 120,
-    "brand": "Vortique Link",
-    "primaryImage": "https://vortique.in/images/20260811001250_type c charger pack.webp",
+    "brand": "Mobixia Link",
+    "primaryImage": "/images/products/product_img_11.webp",
     "images": [
-      "https://vortique.in/images/20260811001250_type c charger pack.webp",
-      "https://vortique.in/images/20260811001620_51u2MqPaQwL._AC_UY327_FMwebp_QL65_[1].jpg"
+      "/images/products/product_img_11.webp",
+      "/images/products/product_img_12.jpg"
     ],
     "isFeatured": true,
     "isBestSeller": true,
@@ -265,19 +274,21 @@
         "id": 231,
         "color": "Space Gray Braided",
         "model": "1.5 Meter",
-        "sku": "VOR-CBL-23-GRY",
+        "sku": "MBX-CBL-23-GRY",
         "price": 299,
         "mrp": 799,
-        "stock": 60
+        "stock": 60,
+        "image": "/images/products/product_img_11.webp"
       },
       {
         "id": 232,
         "color": "Crimson Red Braided",
         "model": "1.5 Meter",
-        "sku": "VOR-CBL-23-RED",
+        "sku": "MBX-CBL-23-RED",
         "price": 299,
         "mrp": 799,
-        "stock": 60
+        "stock": 60,
+        "image": "/images/products/product_img_11.webp"
       }
     ]
   },
@@ -293,10 +304,10 @@
     "reviewCount": 95,
     "inStock": true,
     "stock": 200,
-    "brand": "Vortique Care",
-    "primaryImage": "https://vortique.in/images/20260811114429_images[1]",
+    "brand": "Mobixia Care",
+    "primaryImage": "/images/products/product_img_13.jpg",
     "images": [
-      "https://vortique.in/images/20260811114429_images[1]"
+      "/images/products/product_img_13.jpg"
     ],
     "isFeatured": false,
     "isBestSeller": false,
@@ -311,10 +322,11 @@
         "id": 201,
         "color": "Multicolor Pack",
         "model": "Universal 4-Pack",
-        "sku": "VOR-CBL-20-MULTI",
+        "sku": "MBX-CBL-20-MULTI",
         "price": 89,
         "mrp": 299,
-        "stock": 200
+        "stock": 200,
+        "image": "/images/products/product_img_13.jpg"
       }
     ]
   },
@@ -331,10 +343,10 @@
     "inStock": true,
     "stock": 25,
     "brand": "boAt",
-    "primaryImage": "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+    "primaryImage": "/images/products/product_img_14.jpg",
     "images": [
-      "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
-      "https://vortique.in/images/20260812174717_61cIHzCDl6L._AC_UY327_FMwebp_QL65_[1].jpg"
+      "/images/products/product_img_14.jpg",
+      "/images/products/product_img_15.jpg"
     ],
     "isFeatured": true,
     "isBestSeller": true,
@@ -351,19 +363,21 @@
         "id": 151,
         "color": "Zenith Obsidian Black",
         "model": "ANC Pro",
-        "sku": "VOR-AUD-15-BLK",
+        "sku": "MBX-AUD-15-BLK",
         "price": 9990,
         "mrp": 14990,
-        "stock": 15
+        "stock": 15,
+        "image": "/images/products/product_img_14.jpg"
       },
       {
         "id": 152,
         "color": "Ivory White Gold",
         "model": "ANC Pro",
-        "sku": "VOR-AUD-15-WHT",
+        "sku": "MBX-AUD-15-WHT",
         "price": 9990,
         "mrp": 14990,
-        "stock": 10
+        "stock": 10,
+        "image": "/images/products/product_img_14.jpg"
       }
     ]
   },
@@ -379,11 +393,11 @@
     "reviewCount": 188,
     "inStock": true,
     "stock": 75,
-    "brand": "Vortique Audio",
-    "primaryImage": "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+    "brand": "Mobixia Audio",
+    "primaryImage": "/images/products/product_img_14.jpg",
     "images": [
-      "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
-      "https://vortique.in/images/20260812174717_61cIHzCDl6L._AC_UY327_FMwebp_QL65_[1].jpg"
+      "/images/products/product_img_14.jpg",
+      "/images/products/product_img_15.jpg"
     ],
     "isFeatured": false,
     "isBestSeller": true,
@@ -399,19 +413,21 @@
         "id": 161,
         "color": "Phantom Black",
         "model": "TWS-ENC",
-        "sku": "VOR-AUD-16-BLK",
+        "sku": "MBX-AUD-16-BLK",
         "price": 699,
         "mrp": 1499,
-        "stock": 40
+        "stock": 40,
+        "image": "/images/products/product_img_14.jpg"
       },
       {
         "id": 162,
         "color": "Frost Blue",
         "model": "TWS-ENC",
-        "sku": "VOR-AUD-16-BLU",
+        "sku": "MBX-AUD-16-BLU",
         "price": 699,
         "mrp": 1499,
-        "stock": 35
+        "stock": 35,
+        "image": "/images/products/product_img_14.jpg"
       }
     ]
   },
@@ -427,10 +443,10 @@
     "reviewCount": 92,
     "inStock": true,
     "stock": 30,
-    "brand": "Vortique Audio",
-    "primaryImage": "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+    "brand": "Mobixia Audio",
+    "primaryImage": "/images/products/product_img_14.jpg",
     "images": [
-      "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg"
+      "/images/products/product_img_14.jpg"
     ],
     "isFeatured": true,
     "isBestSeller": false,
@@ -446,10 +462,11 @@
         "id": 251,
         "color": "Matte Carbon Black",
         "model": "Studio Over-Ear",
-        "sku": "VOR-AUD-25-BLK",
+        "sku": "MBX-AUD-25-BLK",
         "price": 1650,
         "mrp": 3499,
-        "stock": 30
+        "stock": 30,
+        "image": "/images/products/product_img_14.jpg"
       }
     ]
   },
@@ -465,11 +482,11 @@
     "reviewCount": 175,
     "inStock": true,
     "stock": 45,
-    "brand": "Vortique MagCharge",
-    "primaryImage": "https://vortique.in/images/20260812170815_61FEiRJcFiL._AC_UL165_SR165,165_[1].jpg",
+    "brand": "Mobixia MagCharge",
+    "primaryImage": "/images/products/product_img_16.jpg",
     "images": [
-      "https://vortique.in/images/20260812170815_61FEiRJcFiL._AC_UL165_SR165,165_[1].jpg",
-      "https://vortique.in/images/20260901123902_01.png"
+      "/images/products/product_img_16.jpg",
+      "/images/products/product_img_17.png"
     ],
     "isFeatured": true,
     "isBestSeller": true,
@@ -486,19 +503,21 @@
         "id": 241,
         "color": "Titanium Gray",
         "model": "10000mAh MagSafe",
-        "sku": "VOR-PB-24-GRY",
+        "sku": "MBX-PB-24-GRY",
         "price": 1499,
         "mrp": 2999,
-        "stock": 25
+        "stock": 25,
+        "image": "/images/products/product_img_16.jpg"
       },
       {
         "id": 242,
         "color": "Cloud White",
         "model": "10000mAh MagSafe",
-        "sku": "VOR-PB-24-WHT",
+        "sku": "MBX-PB-24-WHT",
         "price": 1499,
         "mrp": 2999,
-        "stock": 20
+        "stock": 20,
+        "image": "/images/products/product_img_16.jpg"
       }
     ]
   },
@@ -514,11 +533,11 @@
     "reviewCount": 112,
     "inStock": true,
     "stock": 35,
-    "brand": "Vortique Power",
-    "primaryImage": "https://vortique.in/images/20260901123902_01.png",
+    "brand": "Mobixia Power",
+    "primaryImage": "/images/products/product_img_17.png",
     "images": [
-      "https://vortique.in/images/20260901123902_01.png",
-      "https://vortique.in/images/20260901123903_feature1_09.png"
+      "/images/products/product_img_17.png",
+      "/images/products/product_img_18.png"
     ],
     "isFeatured": false,
     "isBestSeller": false,
@@ -535,10 +554,11 @@
         "id": 281,
         "color": "Midnight Black",
         "model": "20000mAh Turbo",
-        "sku": "VOR-PB-28-BLK",
+        "sku": "MBX-PB-28-BLK",
         "price": 1899,
         "mrp": 3499,
-        "stock": 35
+        "stock": 35,
+        "image": "/images/products/product_img_17.png"
       }
     ]
   },
@@ -554,10 +574,10 @@
     "reviewCount": 140,
     "inStock": true,
     "stock": 65,
-    "brand": "Vortique Mounts",
-    "primaryImage": "https://vortique.in/images/20260901123902_01.png",
+    "brand": "Mobixia Mounts",
+    "primaryImage": "/images/products/product_img_17.png",
     "images": [
-      "https://vortique.in/images/20260901123902_01.png"
+      "/images/products/product_img_17.png"
     ],
     "isFeatured": false,
     "isBestSeller": false,
@@ -572,10 +592,11 @@
         "id": 221,
         "color": "Stealth Black",
         "model": "Dashboard & Windshield",
-        "sku": "VOR-MNT-22-BLK",
+        "sku": "MBX-MNT-22-BLK",
         "price": 399,
         "mrp": 899,
-        "stock": 65
+        "stock": 65,
+        "image": "/images/products/product_img_17.png"
       }
     ]
   },
@@ -591,10 +612,10 @@
     "reviewCount": 96,
     "inStock": true,
     "stock": 80,
-    "brand": "Vortique Desk",
-    "primaryImage": "https://vortique.in/images/20260901123902_01.png",
+    "brand": "Mobixia Desk",
+    "primaryImage": "/images/products/product_img_17.png",
     "images": [
-      "https://vortique.in/images/20260901123902_01.png"
+      "/images/products/product_img_17.png"
     ],
     "isFeatured": false,
     "isBestSeller": false,
@@ -609,19 +630,21 @@
         "id": 181,
         "color": "Silver Metallic",
         "model": "Desktop Stand",
-        "sku": "VOR-MNT-18-SLV",
+        "sku": "MBX-MNT-18-SLV",
         "price": 249,
         "mrp": 599,
-        "stock": 40
+        "stock": 40,
+        "image": "/images/products/product_img_17.png"
       },
       {
         "id": 182,
         "color": "Space Gray",
         "model": "Desktop Stand",
-        "sku": "VOR-MNT-18-GRY",
+        "sku": "MBX-MNT-18-GRY",
         "price": 249,
         "mrp": 599,
-        "stock": 40
+        "stock": 40,
+        "image": "/images/products/product_img_17.png"
       }
     ]
   }

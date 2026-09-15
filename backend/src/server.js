@@ -31,8 +31,9 @@ app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static uploads folder
+// Static uploads and images folders
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/images', express.static(path.join(__dirname, '../../frontend/public/images')));
 
 // API Version 1 Routes
 const authRoutes = require('./routes/auth.routes');

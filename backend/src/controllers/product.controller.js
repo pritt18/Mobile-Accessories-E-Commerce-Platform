@@ -38,8 +38,8 @@ const formatProduct = (p) => {
     },
     brand: {
       id: 1,
-      name: p.brand || 'Vortique',
-      slug: (p.brand || 'vortique').toLowerCase().replace(/\s+/g, '-')
+      name: p.brand || 'Mobixia',
+      slug: (p.brand || 'mobixia').toLowerCase().replace(/\s+/g, '-')
     },
     price: minPrice,
     mrp: minMrp,

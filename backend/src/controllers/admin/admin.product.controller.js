@@ -35,7 +35,7 @@ const getAdminProducts = async (req, res) => {
         },
         brand: {
           id: 1,
-          name: p.brand || 'Vortique'
+          name: p.brand || 'Mobixia'
         },
         status: 'ACTIVE',
         is_featured: !!p.isFeatured,
@@ -63,7 +63,7 @@ const getAdminProducts = async (req, res) => {
 };
 
 const createProduct = async (req, res) => {
-  return successResponse(res, req.body, 'Product catalog is configured in static mode (vortique.in products)', 201);
+  return successResponse(res, req.body, 'Product catalog is configured in static mode', 201);
 };
 
 const updateProduct = async (req, res) => {

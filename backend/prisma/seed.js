@@ -116,7 +116,7 @@ async function main() {
   await prisma.user.deleteMany({
     where: {
       email: {
-        in: ['superadmin@vortique.test', 'admin@vortique.test', 'manager@vortique.test', 'admin@mobixia.com', 'john@mobixia.com', 'john@example.com']
+        in: ['admin@mobixia.com', 'john@mobixia.com', 'john@example.com']
       }
     }
   });
