@@ -495,70 +495,9 @@ async function main() {
     }
   }
 
-  // 8. Coupons
-  await prisma.coupon.upsert({
-    where: { code: 'FIRST10' },
-    update: {},
-    create: {
-      code: 'FIRST10',
-      type: 'PERCENTAGE',
-      value: 10,
-      min_order_value: 499,
-      max_discount: 500,
-      usage_limit: 500,
-      status: 'ACTIVE',
-    },
-  });
+  // 8. Coupons, Banners & CMS Pages are served statically/in-memory for zero database storage and cloud billing
 
-  await prisma.coupon.upsert({
-    where: { code: 'FLAT200' },
-    update: {},
-    create: {
-      code: 'FLAT200',
-      type: 'FLAT',
-      value: 200,
-      min_order_value: 1499,
-      usage_limit: 200,
-      status: 'ACTIVE',
-    },
-  });
-
-  // 9. Banners
-  await prisma.banner.createMany({
-    data: [
-      {
-        title: 'Next-Gen Mobile Gear, Engineered to Elevate',
-        subtitle: 'Aviation-Grade MagSafe Cases, 65W GaN Chargers & Precision Accessories',
-        image: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=1600&auto=format&fit=crop&q=80',
-        link: '/products?category=phone-cases',
-        position: 'HERO',
-        sort_order: 1,
-        status: 'ACTIVE',
-      },
-      {
-        title: 'Uncompromised 65W GaN Fast Charging',
-        subtitle: 'Power your laptop, tablet, and phone with one pocket-sized adapter',
-        image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=1600&auto=format&fit=crop&q=80',
-        link: '/products?category=chargers',
-        position: 'HERO',
-        sort_order: 2,
-        status: 'ACTIVE',
-      },
-      {
-        title: 'Limited Flash Sale: 20% Off Audio & Power Banks',
-        subtitle: 'Use promo code FLASH20 at checkout today',
-        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1200&auto=format&fit=crop&q=80',
-        link: '/products?category=audio',
-        position: 'PROMO_TOP',
-        sort_order: 1,
-        status: 'ACTIVE',
-      },
-    ],
-  });
-
-  // 10. CMS Pages (Handled statically in-memory for zero database storage/billing)
-
-  // 11. Operational Settings (with dynamic Delivery Fees)
+  // 9. Operational Settings (with dynamic Delivery Fees)
   const settingsData = [
     { key: 'site_name', value: 'Mobixia' },
     { key: 'site_tagline', value: 'Mobile Accessories Online' },

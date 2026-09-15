@@ -5,6 +5,7 @@ const { sendNotification } = require('../utils/mailer');
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const products = require('../data/products.json');
+const { getStaticCoupon, incrementCouponUsage } = require('./coupon.controller');
 
 const findProductAndVariant = (productId, variantId) => {
   let product = products.find((p) => p.id === parseInt(productId));
@@ -128,9 +129,7 @@ const createOrder = async (req, res) => {
     let appliedCoupon = null;
 
     if (couponCode) {
-      appliedCoupon = await prisma.coupon.findUnique({
-        where: { code: couponCode.toUpperCase(), status: 'ACTIVE' },
-      });
+      appliedCoupon = getStaticCoupon(couponCode);
 
       if (appliedCoupon) {
         if (subtotal >= appliedCoupon.min_order_value) {
@@ -243,10 +242,7 @@ const createOrder = async (req, res) => {
 
       // 3. Update coupon usage count if applied
       if (appliedCoupon) {
-        await tx.coupon.update({
-          where: { id: appliedCoupon.id },
-          data: { used_count: { increment: 1 } },
-        });
+        incrementCouponUsage(appliedCoupon.code);
       }
 
       // 4. Clear user's cart

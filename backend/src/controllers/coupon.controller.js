@@ -1,25 +1,70 @@
-const prisma = require('../config/db');
 const { successResponse, errorResponse } = require('../utils/response');
+
+let staticCoupons = [
+  {
+    id: 1,
+    code: 'FIRST10',
+    type: 'PERCENTAGE',
+    value: 10,
+    min_order_value: 499,
+    max_discount: 500,
+    usage_limit: 1000,
+    used_count: 0,
+    status: 'ACTIVE',
+  },
+  {
+    id: 2,
+    code: 'FLAT200',
+    type: 'FLAT',
+    value: 200,
+    min_order_value: 1499,
+    max_discount: null,
+    usage_limit: 500,
+    used_count: 0,
+    status: 'ACTIVE',
+  },
+  {
+    id: 3,
+    code: 'MOBIXIA10',
+    type: 'PERCENTAGE',
+    value: 10,
+    min_order_value: 299,
+    max_discount: 200,
+    usage_limit: 1000,
+    used_count: 0,
+    status: 'ACTIVE',
+  },
+  {
+    id: 4,
+    code: 'WELCOME50',
+    type: 'FLAT',
+    value: 50,
+    min_order_value: 399,
+    max_discount: null,
+    usage_limit: 1000,
+    used_count: 0,
+    status: 'ACTIVE',
+  },
+];
+
+const getStaticCoupon = (code) => {
+  if (!code) return null;
+  return staticCoupons.find((c) => c.code.toUpperCase() === code.toUpperCase().trim() && c.status === 'ACTIVE') || null;
+};
+
+const incrementCouponUsage = (code) => {
+  const c = getStaticCoupon(code);
+  if (c) c.used_count += 1;
+};
 
 const validateCoupon = async (req, res) => {
   try {
     const { code, cartTotal } = req.body;
     if (!code) return errorResponse(res, 'Coupon code is required', 400);
 
-    const coupon = await prisma.coupon.findUnique({
-      where: { code: code.toUpperCase() },
-    });
-
-    if (!coupon || coupon.status !== 'ACTIVE') {
+    const coupon = getStaticCoupon(code);
+    if (!coupon) {
       return errorResponse(res, 'Invalid or expired promo code', 400);
-    }
-
-    const now = new Date();
-    if (coupon.start_date && now < coupon.start_date) {
-      return errorResponse(res, 'This coupon is not active yet', 400);
-    }
-    if (coupon.end_date && now > coupon.end_date) {
-      return errorResponse(res, 'This coupon has expired', 400);
     }
 
     if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
@@ -28,7 +73,7 @@ const validateCoupon = async (req, res) => {
 
     const total = parseFloat(cartTotal) || 0;
     if (total < coupon.min_order_value) {
-      return errorResponse(res, `Minimum order amount of ?${coupon.min_order_value} required for this coupon`, 400);
+      return errorResponse(res, `Minimum order amount of ₹${coupon.min_order_value} required for this coupon`, 400);
     }
 
     let discount = 0;
@@ -56,4 +101,7 @@ const validateCoupon = async (req, res) => {
 
 module.exports = {
   validateCoupon,
+  staticCoupons,
+  getStaticCoupon,
+  incrementCouponUsage,
 };

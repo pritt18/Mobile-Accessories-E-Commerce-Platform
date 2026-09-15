@@ -154,22 +154,6 @@ model OrderStatusHistory {
   changed_at DateTime @default(now())
 }
 
-model Coupon {
-  id              Int       @id @default(autoincrement())
-  code            String    @unique
-  type            String    @default("PERCENTAGE") // PERCENTAGE, FLAT
-  value           Float
-  min_order_value Float     @default(0)
-  max_discount    Float?
-  usage_limit     Int       @default(100)
-  used_count      Int       @default(0)
-  start_date      DateTime?
-  end_date        DateTime?
-  status          String    @default("ACTIVE") // ACTIVE, INACTIVE
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
 model Wishlist {
   id         Int      @id @default(autoincrement())
   user_id    Int

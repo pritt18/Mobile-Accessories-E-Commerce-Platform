@@ -2,11 +2,12 @@ const prisma = require('../../config/db');
 const { successResponse, errorResponse } = require('../../utils/response');
 const { logAuditAction } = require('../../middleware/audit');
 
+const { staticCoupons } = require('../coupon.controller');
+
 // --- Coupons ---
 const getCoupons = async (req, res) => {
   try {
-    const coupons = await prisma.coupon.findMany({ orderBy: { createdAt: 'desc' } });
-    return successResponse(res, coupons);
+    return successResponse(res, staticCoupons);
   } catch (err) {
     return errorResponse(res, err.message, 500);
   }
@@ -14,30 +15,21 @@ const getCoupons = async (req, res) => {
 
 const createCoupon = async (req, res) => {
   try {
-    const { code, type, value, minOrderValue, maxDiscount, usageLimit, startDate, endDate, status } = req.body;
+    const { code, type, value, minOrderValue, maxDiscount, usageLimit, status } = req.body;
     if (!code || !value) return errorResponse(res, 'Code and value are required', 400);
 
-    const coupon = await prisma.coupon.create({
-      data: {
-        code: code.toUpperCase().trim(),
-        type: type || 'PERCENTAGE',
-        value: parseFloat(value),
-        min_order_value: parseFloat(minOrderValue) || 0,
-        max_discount: maxDiscount ? parseFloat(maxDiscount) : null,
-        usage_limit: parseInt(usageLimit) || 100,
-        start_date: startDate ? new Date(startDate) : null,
-        end_date: endDate ? new Date(endDate) : null,
-        status: status || 'ACTIVE',
-      },
-    });
-
-    await logAuditAction({
-      userId: req.user.id,
-      module: 'marketing',
-      action: 'create_coupon',
-      description: `Created coupon code "${coupon.code}"`,
-      req,
-    });
+    const coupon = {
+      id: Date.now(),
+      code: code.toUpperCase().trim(),
+      type: type || 'PERCENTAGE',
+      value: parseFloat(value),
+      min_order_value: parseFloat(minOrderValue) || 0,
+      max_discount: maxDiscount ? parseFloat(maxDiscount) : null,
+      usage_limit: parseInt(usageLimit) || 100,
+      used_count: 0,
+      status: status || 'ACTIVE',
+    };
+    staticCoupons.unshift(coupon);
 
     return successResponse(res, coupon, 'Coupon created successfully', 201);
   } catch (err) {
@@ -48,7 +40,11 @@ const createCoupon = async (req, res) => {
 const deleteCoupon = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.coupon.delete({ where: { id: parseInt(id) } });
+    const cId = parseInt(id);
+    const idx = staticCoupons.findIndex((c) => c.id === cId);
+    if (idx !== -1) {
+      staticCoupons.splice(idx, 1);
+    }
     return successResponse(res, null, 'Coupon deleted');
   } catch (err) {
     return errorResponse(res, err.message, 500);
