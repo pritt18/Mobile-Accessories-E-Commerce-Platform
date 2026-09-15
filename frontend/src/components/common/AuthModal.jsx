@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, User, Phone, CheckCircle, AlertCircle, Key, ArrowLeft, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Mail, Lock, User, Phone, CheckCircle, AlertCircle, ArrowLeft, ShieldCheck, RefreshCw } from 'lucide-react';
 
 export const AuthModal = ({ isOpen, onClose }) => {
   const { login, register, sendOtp, forgotPassword, resetPassword, googleLogin } = useAuth();
@@ -199,12 +199,6 @@ export const AuthModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const fillDemo = (id, pass) => {
-    setIdentifier(id);
-    setPassword(pass);
-    setError('');
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -364,56 +358,6 @@ export const AuthModal = ({ isOpen, onClose }) => {
             </svg>
             <span>Sign in with Google</span>
           </button>
-
-          {/* Quick Demo Autofill Box */}
-          <div className="mt-5 pt-4 border-t border-gray-200">
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center space-x-1">
-              <Key size={12} className="text-amber-500" />
-              <span>1-Click Test Account Quick-Fill:</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <button
-                type="button"
-                onClick={() => fillDemo('superadmin@mobixia.in', 'Password@123')}
-                className="p-2 text-left bg-slate-50 hover:bg-slate-100 border border-amber-200 hover:border-amber-400 rounded-lg text-amber-800 transition"
-              >
-                <div className="font-bold flex items-center space-x-1">
-                  <span>👑 Super Admin</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate">superadmin@mobixia.in</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('admin@mobixia.in', 'Password@123')}
-                className="p-2 text-left bg-slate-50 hover:bg-slate-100 border border-blue-200 hover:border-blue-400 rounded-lg text-blue-800 transition"
-              >
-                <div className="font-bold flex items-center space-x-1">
-                  <span>🛡️ Operations Admin</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate">admin@mobixia.in</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('manager@mobixia.in', 'Password@123')}
-                className="p-2 text-left bg-slate-50 hover:bg-slate-100 border border-emerald-200 hover:border-emerald-400 rounded-lg text-emerald-800 transition"
-              >
-                <div className="font-bold flex items-center space-x-1">
-                  <span>📦 Staff Manager</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate">manager@mobixia.in</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo('pritamgangurde17@gmail.com', 'Password@123')}
-                className="p-2 text-left bg-slate-50 hover:bg-slate-100 border border-purple-200 hover:border-purple-400 rounded-lg text-purple-800 transition"
-              >
-                <div className="font-bold flex items-center space-x-1">
-                  <span>🛍️ Customer</span>
-                </div>
-                <div className="text-[10px] text-slate-500 truncate">pritamgangurde17@...</div>
-              </button>
-            </div>
-          </div>
         </form>
       )}
 
