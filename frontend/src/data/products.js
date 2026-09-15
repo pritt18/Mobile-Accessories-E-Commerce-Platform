@@ -1,0 +1,660 @@
+export const HARDCODED_PRODUCTS = [
+  {
+    "id": 33,
+    "name": "sadgatih Back Cover for Apple iPhone 17 (Transparent, Dual Protection, Silicon)",
+    "slug": "sadgatih-back-cover-apple-iphone-17",
+    "category": "phone-cases",
+    "price": 259,
+    "mrp": 999,
+    "discountPercent": 74,
+    "rating": 4.8,
+    "reviewCount": 124,
+    "inStock": true,
+    "stock": 85,
+    "brand": "Vortique Sadgatih",
+    "primaryImage": "https://vortique.in/images/20260909131205_1-1.JPG",
+    "images": [
+      "https://vortique.in/images/20260909131205_1-1.JPG",
+      "https://vortique.in/images/20260909131205_feature1_1-2.JPG",
+      "https://vortique.in/images/20260909131205_feature2_1-3.JPG",
+      "https://vortique.in/images/20260909131205_feature3_1-4.JPG",
+      "https://vortique.in/images/20260909131205_feature4_1-5.JPG"
+    ],
+    "isFeatured": true,
+    "isBestSeller": true,
+    "description": "Engineered specifically for Apple iPhone with crystal-clear non-yellowing German Bayer TPU, raised camera lips, and dual corner air cushions for military-grade drop shock absorption.",
+    "specifications": {
+      "Compatible Models": "Apple iPhone 17 / iPhone 16 / iPhone 15",
+      "Material": "Bayer Clear Silicone TPU + Scratch-Resistant PC Back",
+      "Shock Protection": "Certified 8ft Drop Tested with Air Cushions",
+      "Wireless Charging": "MagSafe & Qi Wireless Charging Compatible",
+      "Warranty": "6 Months Replacement Warranty"
+    },
+    "variants": [
+      {
+        "id": 331,
+        "color": "Crystal Clear",
+        "model": "iPhone 17",
+        "sku": "VOR-CASE-33-CLR17",
+        "price": 259,
+        "mrp": 999,
+        "stock": 30
+      },
+      {
+        "id": 332,
+        "color": "Crystal Clear",
+        "model": "iPhone 16 Pro Max",
+        "sku": "VOR-CASE-33-CLR16PM",
+        "price": 259,
+        "mrp": 999,
+        "stock": 25
+      },
+      {
+        "id": 333,
+        "color": "Smoky Black",
+        "model": "iPhone 16 Pro",
+        "sku": "VOR-CASE-33-BLK16P",
+        "price": 279,
+        "mrp": 999,
+        "stock": 30
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Premium Vintage Leather Flip Wallet Cover with Magnetic Clasp",
+    "slug": "premium-vintage-leather-flip-wallet-cover",
+    "category": "phone-cases",
+    "price": 949,
+    "mrp": 1899,
+    "discountPercent": 50,
+    "rating": 4.7,
+    "reviewCount": 86,
+    "inStock": true,
+    "stock": 40,
+    "brand": "Vortique Craft",
+    "primaryImage": "https://vortique.in/images/20260812191425_712SFJqKFCL._AC_UL480_FMwebp_QL65_[1].jpg",
+    "images": [
+      "https://vortique.in/images/20260812191425_712SFJqKFCL._AC_UL480_FMwebp_QL65_[1].jpg",
+      "https://vortique.in/images/cover.jpg"
+    ],
+    "isFeatured": true,
+    "isBestSeller": false,
+    "description": "Handcrafted PU leather flip case with integrated 3-card slots, hidden cash pocket, and horizontal landscape kickstand for comfortable media viewing.",
+    "specifications": {
+      "Compatible Models": "Samsung S24 Ultra / iPhone 16 Pro / OnePlus 12",
+      "Material": "Full Grain Vegan Leather + Inner TPU Shell",
+      "Features": "Card Slots, Cash Pocket, Magnetic Flip, Stand",
+      "Warranty": "1 Year Craftsmanship Warranty"
+    },
+    "variants": [
+      {
+        "id": 81,
+        "color": "Cognac Brown",
+        "model": "Universal Fit",
+        "sku": "VOR-CASE-8-BRN",
+        "price": 949,
+        "mrp": 1899,
+        "stock": 20
+      },
+      {
+        "id": 82,
+        "color": "Midnight Black",
+        "model": "Universal Fit",
+        "sku": "VOR-CASE-8-BLK",
+        "price": 949,
+        "mrp": 1899,
+        "stock": 20
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "name": "65W GaN Fast Charger Adapter (Dual Type-C + USB-A)",
+    "slug": "65w-gan-fast-charger-adapter-dual-type-c-usb-a",
+    "category": "chargers",
+    "price": 1299,
+    "mrp": 2499,
+    "discountPercent": 48,
+    "rating": 4.9,
+    "reviewCount": 210,
+    "inStock": true,
+    "stock": 60,
+    "brand": "Vortique Power",
+    "primaryImage": "https://vortique.in/images/20260912133602_charger.jpg",
+    "images": [
+      "https://vortique.in/images/20260912133602_charger.jpg",
+      "https://vortique.in/images/20260811002601_wall charger.webp",
+      "https://vortique.in/images/20260811004239_51fpGWaB-pL._AC_UY327_FMwebp_QL65_[1].jpg"
+    ],
+    "isFeatured": true,
+    "isBestSeller": true,
+    "description": "Next-gen Gallium Nitride (GaN) III technology delivering 65W ultra-compact laptop and smartphone charging with triple device intelligent power distribution.",
+    "specifications": {
+      "Total Output": "65W Max Power Delivery 3.0 / PPS / QC 4.0",
+      "Ports": "2x USB-C (65W Max) + 1x USB-A (30W Max)",
+      "Safety": "Over-voltage, Over-current & Surge Protection",
+      "Warranty": "2 Years Replacement Guarantee"
+    },
+    "variants": [
+      {
+        "id": 351,
+        "color": "Glossy White",
+        "model": "India 2-Pin Plug",
+        "sku": "VOR-CHG-35-WHT",
+        "price": 1299,
+        "mrp": 2499,
+        "stock": 35
+      },
+      {
+        "id": 352,
+        "color": "Matte Black",
+        "model": "India 2-Pin Plug",
+        "sku": "VOR-CHG-35-BLK",
+        "price": 1349,
+        "mrp": 2499,
+        "stock": 25
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "20W PD Dual Port Fast Mobile Charger Adapter",
+    "slug": "20w-pd-dual-port-fast-mobile-charger-adapter",
+    "category": "chargers",
+    "price": 449,
+    "mrp": 899,
+    "discountPercent": 50,
+    "rating": 4.7,
+    "reviewCount": 142,
+    "inStock": true,
+    "stock": 90,
+    "brand": "Vortique Power",
+    "primaryImage": "https://vortique.in/images/20260811002601_wall charger.webp",
+    "images": [
+      "https://vortique.in/images/20260811002601_wall charger.webp",
+      "https://vortique.in/images/20260912133602_charger.jpg"
+    ],
+    "isFeatured": false,
+    "isBestSeller": true,
+    "description": "Charges iPhone to 50% in just 28 minutes. Features dual USB-C Power Delivery and Quick Charge 3.0 USB-A port for simultaneous charging.",
+    "specifications": {
+      "Output": "20W Max PD 3.0 & QC 3.0",
+      "Compatibility": "iPhone 11-16, Pixel, Samsung, AirPods, iPad",
+      "Warranty": "1 Year Standard Warranty"
+    },
+    "variants": [
+      {
+        "id": 211,
+        "color": "Alpine White",
+        "model": "Standard Adapter",
+        "sku": "VOR-CHG-21-WHT",
+        "price": 449,
+        "mrp": 899,
+        "stock": 90
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "33W SuperVOOC / Dash Fast USB Wall Charger",
+    "slug": "33w-supervooc-dash-fast-usb-wall-charger",
+    "category": "chargers",
+    "price": 599,
+    "mrp": 1299,
+    "discountPercent": 54,
+    "rating": 4.6,
+    "reviewCount": 78,
+    "inStock": true,
+    "stock": 50,
+    "brand": "Vortique Power",
+    "primaryImage": "https://vortique.in/images/20260912133602_charger.jpg",
+    "images": [
+      "https://vortique.in/images/20260912133602_charger.jpg",
+      "https://vortique.in/images/20260811004239_51fpGWaB-pL._AC_UY327_FMwebp_QL65_[1].jpg"
+    ],
+    "isFeatured": false,
+    "isBestSeller": false,
+    "description": "High efficiency 33W flash charger optimized for OnePlus Dash/Warp, Realme Dart, and Xiaomi SonicCharge protocols with low heat dissipation.",
+    "specifications": {
+      "Speed": "33W Flash Charge",
+      "Connector": "USB Type-A output port",
+      "Warranty": "1 Year Warranty"
+    },
+    "variants": [
+      {
+        "id": 191,
+        "color": "White & Red Accents",
+        "model": "33W Flash Adapter",
+        "sku": "VOR-CHG-19",
+        "price": 599,
+        "mrp": 1299,
+        "stock": 50
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Type-C to Type-C 100W Braided Fast Charging Cable (1.5m)",
+    "slug": "type-c-to-type-c-100w-braided-fast-charging-cable",
+    "category": "cables",
+    "price": 299,
+    "mrp": 799,
+    "discountPercent": 62,
+    "rating": 4.8,
+    "reviewCount": 310,
+    "inStock": true,
+    "stock": 120,
+    "brand": "Vortique Link",
+    "primaryImage": "https://vortique.in/images/20260811001250_type c charger pack.webp",
+    "images": [
+      "https://vortique.in/images/20260811001250_type c charger pack.webp",
+      "https://vortique.in/images/20260811001620_51u2MqPaQwL._AC_UY327_FMwebp_QL65_[1].jpg"
+    ],
+    "isFeatured": true,
+    "isBestSeller": true,
+    "description": "High-tensile military nylon braided 100W cable supporting E-Marker PD charging for MacBooks, iPads, and high-speed 480Mbps data sync.",
+    "specifications": {
+      "Cable Length": "1.5 Meters (4.9 ft)",
+      "Power Rating": "100W (20V/5A E-Marker Chip)",
+      "Durability": "Tested for 20,000+ Bends without Degradation",
+      "Warranty": "2 Years Replacement Warranty"
+    },
+    "variants": [
+      {
+        "id": 231,
+        "color": "Space Gray Braided",
+        "model": "1.5 Meter",
+        "sku": "VOR-CBL-23-GRY",
+        "price": 299,
+        "mrp": 799,
+        "stock": 60
+      },
+      {
+        "id": 232,
+        "color": "Crimson Red Braided",
+        "model": "1.5 Meter",
+        "sku": "VOR-CBL-23-RED",
+        "price": 299,
+        "mrp": 799,
+        "stock": 60
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Spiral Colorful Cable Cord Wire Protectors (Set of 4)",
+    "slug": "spiral-colorful-cable-protectors-set-of-4",
+    "category": "cables",
+    "price": 89,
+    "mrp": 299,
+    "discountPercent": 70,
+    "rating": 4.5,
+    "reviewCount": 95,
+    "inStock": true,
+    "stock": 200,
+    "brand": "Vortique Care",
+    "primaryImage": "https://vortique.in/images/20260811114429_images[1]",
+    "images": [
+      "https://vortique.in/images/20260811114429_images[1]"
+    ],
+    "isFeatured": false,
+    "isBestSeller": false,
+    "description": "Flexible silicone spiral wraps prevent cable neck bending, breakage, fraying, and pet chewing. Extends charging cable life by 5x.",
+    "specifications": {
+      "Pack Contents": "4x Spiral Wire Sleeves",
+      "Material": "High-Elasticity Medical-Grade Silicone",
+      "Universal": "Fits all Lightning, Type-C, Micro-USB cords"
+    },
+    "variants": [
+      {
+        "id": 201,
+        "color": "Multicolor Pack",
+        "model": "Universal 4-Pack",
+        "sku": "VOR-CBL-20-MULTI",
+        "price": 89,
+        "mrp": 299,
+        "stock": 200
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "boAt Nirvana Zenith Pro Active Noise Cancelling TWS",
+    "slug": "boat-nirvana-zenith-pro-anc-tws",
+    "category": "audio",
+    "price": 9990,
+    "mrp": 14990,
+    "discountPercent": 33,
+    "rating": 4.9,
+    "reviewCount": 64,
+    "inStock": true,
+    "stock": 25,
+    "brand": "boAt",
+    "primaryImage": "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+    "images": [
+      "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+      "https://vortique.in/images/20260812174717_61cIHzCDl6L._AC_UY327_FMwebp_QL65_[1].jpg"
+    ],
+    "isFeatured": true,
+    "isBestSeller": true,
+    "description": "Flagship audiophile earbuds featuring Hi-Res Audio certification, 50dB Hybrid Active Noise Cancellation, and 50 hours of total playtime.",
+    "specifications": {
+      "ANC Level": "Up to 50dB Hybrid Active Noise Cancellation",
+      "Playtime": "50 Hours with Fast ASAP Charge",
+      "Drivers": "11mm Dynamic + Balanced Armature Dual Drivers",
+      "Bluetooth": "v5.3 with LDAC Codec Support",
+      "Warranty": "1 Year Brand Warranty"
+    },
+    "variants": [
+      {
+        "id": 151,
+        "color": "Zenith Obsidian Black",
+        "model": "ANC Pro",
+        "sku": "VOR-AUD-15-BLK",
+        "price": 9990,
+        "mrp": 14990,
+        "stock": 15
+      },
+      {
+        "id": 152,
+        "color": "Ivory White Gold",
+        "model": "ANC Pro",
+        "sku": "VOR-AUD-15-WHT",
+        "price": 9990,
+        "mrp": 14990,
+        "stock": 10
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "Wireless TWS Earbuds with Quad Mic ENC & 40H Playtime",
+    "slug": "wireless-tws-earbuds-quad-mic-enc",
+    "category": "audio",
+    "price": 699,
+    "mrp": 1499,
+    "discountPercent": 53,
+    "rating": 4.7,
+    "reviewCount": 188,
+    "inStock": true,
+    "stock": 75,
+    "brand": "Vortique Audio",
+    "primaryImage": "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+    "images": [
+      "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+      "https://vortique.in/images/20260812174717_61cIHzCDl6L._AC_UY327_FMwebp_QL65_[1].jpg"
+    ],
+    "isFeatured": false,
+    "isBestSeller": true,
+    "description": "Crystal clear phone calls with Environmental Noise Cancellation (ENC), instant touch gestures, IPX5 sweat resistance, and deep 13mm bass drivers.",
+    "specifications": {
+      "Playtime": "40 Hours Playback",
+      "Latency": "45ms Low Latency Game Mode",
+      "Waterproof": "IPX5 Sweat & Splash Proof",
+      "Warranty": "1 Year Warranty"
+    },
+    "variants": [
+      {
+        "id": 161,
+        "color": "Phantom Black",
+        "model": "TWS-ENC",
+        "sku": "VOR-AUD-16-BLK",
+        "price": 699,
+        "mrp": 1499,
+        "stock": 40
+      },
+      {
+        "id": 162,
+        "color": "Frost Blue",
+        "model": "TWS-ENC",
+        "sku": "VOR-AUD-16-BLU",
+        "price": 699,
+        "mrp": 1499,
+        "stock": 35
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Over-Ear Wireless Studio Headphones with Deep Bass",
+    "slug": "over-ear-wireless-studio-headphones-deep-bass",
+    "category": "audio",
+    "price": 1650,
+    "mrp": 3499,
+    "discountPercent": 53,
+    "rating": 4.8,
+    "reviewCount": 92,
+    "inStock": true,
+    "stock": 30,
+    "brand": "Vortique Audio",
+    "primaryImage": "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg",
+    "images": [
+      "https://vortique.in/images/20260812173036_61YDbkyIGEL._AC_UY327_FMwebp_QL65_[1].jpg"
+    ],
+    "isFeatured": true,
+    "isBestSeller": false,
+    "description": "Plush memory foam over-ear cushions provide all-day comfort. Features 40mm tuned neodymium acoustic drivers with dual wireless & 3.5mm AUX connectivity.",
+    "specifications": {
+      "Battery Life": "60 Hours Non-Stop Playback",
+      "Drivers": "40mm High Definition Acoustic Drivers",
+      "Connectivity": "Bluetooth 5.3 + 3.5mm Wired Mode",
+      "Warranty": "1 Year Replacement Warranty"
+    },
+    "variants": [
+      {
+        "id": 251,
+        "color": "Matte Carbon Black",
+        "model": "Studio Over-Ear",
+        "sku": "VOR-AUD-25-BLK",
+        "price": 1650,
+        "mrp": 3499,
+        "stock": 30
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "10000mAh Magnetic Wireless MagSafe Power Bank",
+    "slug": "10000mah-magnetic-wireless-magsafe-power-bank",
+    "category": "power-banks",
+    "price": 1499,
+    "mrp": 2999,
+    "discountPercent": 50,
+    "rating": 4.9,
+    "reviewCount": 175,
+    "inStock": true,
+    "stock": 45,
+    "brand": "Vortique MagCharge",
+    "primaryImage": "https://vortique.in/images/20260812170815_61FEiRJcFiL._AC_UL165_SR165,165_[1].jpg",
+    "images": [
+      "https://vortique.in/images/20260812170815_61FEiRJcFiL._AC_UL165_SR165,165_[1].jpg",
+      "https://vortique.in/images/20260901123902_01.png"
+    ],
+    "isFeatured": true,
+    "isBestSeller": true,
+    "description": "Snap-and-charge convenience with strong N52 neodymium magnets. 15W wireless MagSafe charging and 20W PD Type-C fast output with fold-out kickstand.",
+    "specifications": {
+      "Capacity": "10,000mAh Polymer Cell",
+      "Wireless Output": "15W / 10W / 7.5W Qi Certified",
+      "Wired Output": "20W PD Type-C Bi-Directional",
+      "Kickstand": "Integrated Zinc-Alloy Foldable Stand",
+      "Warranty": "1 Year Warranty"
+    },
+    "variants": [
+      {
+        "id": 241,
+        "color": "Titanium Gray",
+        "model": "10000mAh MagSafe",
+        "sku": "VOR-PB-24-GRY",
+        "price": 1499,
+        "mrp": 2999,
+        "stock": 25
+      },
+      {
+        "id": 242,
+        "color": "Cloud White",
+        "model": "10000mAh MagSafe",
+        "sku": "VOR-PB-24-WHT",
+        "price": 1499,
+        "mrp": 2999,
+        "stock": 20
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "name": "20000mAh 22.5W Fast Charging Power Bank with Digital Display",
+    "slug": "20000mah-22-5w-fast-charging-power-bank",
+    "category": "power-banks",
+    "price": 1899,
+    "mrp": 3499,
+    "discountPercent": 46,
+    "rating": 4.8,
+    "reviewCount": 112,
+    "inStock": true,
+    "stock": 35,
+    "brand": "Vortique Power",
+    "primaryImage": "https://vortique.in/images/20260901123902_01.png",
+    "images": [
+      "https://vortique.in/images/20260901123902_01.png",
+      "https://vortique.in/images/20260901123903_feature1_09.png"
+    ],
+    "isFeatured": false,
+    "isBestSeller": false,
+    "description": "Heavy-duty 20000mAh battery charges an iPhone up to 4.5 times. Features real-time numeric LED percentage display, dual USB outputs and PD Type-C input/output.",
+    "specifications": {
+      "Capacity": "20,000mAh Heavy Duty",
+      "Max Speed": "22.5W Super Charge / 20W PD",
+      "Display": "Accurate LED Battery % Indicator",
+      "Flight Safe": "TSA Approved for Airline Carry-on",
+      "Warranty": "1 Year Replacement Guarantee"
+    },
+    "variants": [
+      {
+        "id": 281,
+        "color": "Midnight Black",
+        "model": "20000mAh Turbo",
+        "sku": "VOR-PB-28-BLK",
+        "price": 1899,
+        "mrp": 3499,
+        "stock": 35
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Universal 360° Rotating Car Dashboard Mobile Holder Mount",
+    "slug": "universal-360-rotating-car-dashboard-mobile-holder",
+    "category": "phone-cases",
+    "price": 399,
+    "mrp": 899,
+    "discountPercent": 56,
+    "rating": 4.7,
+    "reviewCount": 140,
+    "inStock": true,
+    "stock": 65,
+    "brand": "Vortique Mounts",
+    "primaryImage": "https://vortique.in/images/20260901123902_01.png",
+    "images": [
+      "https://vortique.in/images/20260901123902_01.png"
+    ],
+    "isFeatured": false,
+    "isBestSeller": false,
+    "description": "Ultra-secure suction gel pad adheres firmly to car dashboards or windshields. Features single-touch quick lock mechanism and flexible 360-degree telescopic ball joint.",
+    "specifications": {
+      "Mount Type": "Suction Pad + AC Vent Dual Clip",
+      "Rotation": "360° Full Swivel & Tilt",
+      "Compatibility": "All Phones 4.0 to 7.0 inches"
+    },
+    "variants": [
+      {
+        "id": 221,
+        "color": "Stealth Black",
+        "model": "Dashboard & Windshield",
+        "sku": "VOR-MNT-22-BLK",
+        "price": 399,
+        "mrp": 899,
+        "stock": 65
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Multi-Purpose Desktop Adjustable Phone & Tablet Stand",
+    "slug": "multi-purpose-desktop-adjustable-phone-tablet-stand",
+    "category": "phone-cases",
+    "price": 249,
+    "mrp": 599,
+    "discountPercent": 58,
+    "rating": 4.8,
+    "reviewCount": 96,
+    "inStock": true,
+    "stock": 80,
+    "brand": "Vortique Desk",
+    "primaryImage": "https://vortique.in/images/20260901123902_01.png",
+    "images": [
+      "https://vortique.in/images/20260901123902_01.png"
+    ],
+    "isFeatured": false,
+    "isBestSeller": false,
+    "description": "Weighted aluminum alloy base with anti-slip rubber pads. Dual-hinge height and viewing angle adjustment with dedicated charging cable pass-through notch.",
+    "specifications": {
+      "Material": "Aerospace Grade Aluminum + Anti-Scratch Silicone",
+      "Foldable": "Pocket-Sized Foldable Design",
+      "Weight": "160g Weighted Stability"
+    },
+    "variants": [
+      {
+        "id": 181,
+        "color": "Silver Metallic",
+        "model": "Desktop Stand",
+        "sku": "VOR-MNT-18-SLV",
+        "price": 249,
+        "mrp": 599,
+        "stock": 40
+      },
+      {
+        "id": 182,
+        "color": "Space Gray",
+        "model": "Desktop Stand",
+        "sku": "VOR-MNT-18-GRY",
+        "price": 249,
+        "mrp": 599,
+        "stock": 40
+      }
+    ]
+  }
+];
+
+export const getProductById = (id) => {
+  const numId = parseInt(id);
+  return HARDCODED_PRODUCTS.find(p => p.id === numId);
+};
+
+export const getProductBySlug = (slug) => {
+  return HARDCODED_PRODUCTS.find(p => p.slug === slug);
+};
+
+export const getProductsByCategory = (category) => {
+  if (!category || category === 'all') return HARDCODED_PRODUCTS;
+  return HARDCODED_PRODUCTS.filter(p => p.category === category);
+};
+
+export const getFeaturedProducts = () => {
+  return HARDCODED_PRODUCTS.filter(p => p.isFeatured);
+};
+
+export const getBestSellers = () => {
+  return HARDCODED_PRODUCTS.filter(p => p.isBestSeller);
+};
+
+export const searchProducts = (query) => {
+  if (!query) return [];
+  const q = query.toLowerCase();
+  return HARDCODED_PRODUCTS.filter(p => 
+    p.name.toLowerCase().includes(q) || 
+    p.category.toLowerCase().includes(q) ||
+    p.brand.toLowerCase().includes(q)
+  );
+};

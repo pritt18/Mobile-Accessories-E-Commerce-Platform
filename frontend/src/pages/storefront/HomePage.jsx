@@ -14,6 +14,7 @@ import {
   Smartphone,
   Headphones,
   Cable,
+  BatteryCharging,
 } from 'lucide-react';
 import api from '../../services/api';
 import { ProductCard } from '../../components/storefront/ProductCard';
@@ -28,34 +29,26 @@ export const HomePage = () => {
   const [banners, setBanners] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeTab, setActiveTab] = useState('trending'); // 'trending' | 'bestSellers' | 'newArrivals'
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadHomeData = async () => {
+    const fetchData = async () => {
       try {
-        const [feedRes, bannerRes] = await Promise.all([
+        const [feedRes, bannersRes] = await Promise.all([
           api.get('/products/home-feed'),
-          api.get('/banners'),
+          api.get('/banners?position=HERO'),
         ]);
-
-        if (feedRes.data?.success) {
-          setFeed(feedRes.data.data);
-        }
-        if (bannerRes.data?.success) {
-          setBanners(bannerRes.data.data || []);
-        }
+        if (feedRes.data?.success) setFeed(feedRes.data.data);
+        if (bannersRes.data?.success) setBanners(bannersRes.data.data);
       } catch (err) {
-        console.error('Home data load error:', err);
-      } finally {
-        setLoading(false);
+        console.error('Home feed error:', err);
       }
     };
-    loadHomeData();
+    fetchData();
   }, []);
 
   // Autoplay hero slider
   useEffect(() => {
-    if (banners.length <= 1) return;
+    if (!banners.length) return;
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
@@ -64,9 +57,9 @@ export const HomePage = () => {
 
   const heroBanners = banners.filter((b) => b.position === 'HERO');
   const activeHero = heroBanners[activeSlide] || {
-    title: 'Precision Mobile Accessories, Engineered to Elevate',
-    subtitle: 'Aviation-Grade MagSafe Cases, 65W GaN Chargers & Precision Accessories',
-    image: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=1600&auto=format&fit=crop&q=80',
+    title: 'Authentic Vortique Mobile Accessories',
+    subtitle: 'German Silicone iPhone Cases, 65W GaN Chargers & MagSafe Accessories',
+    image: 'https://vortique.in/images/20260909131205_1-1.JPG',
     link: '/products',
   };
 
@@ -82,7 +75,8 @@ export const HomePage = () => {
     { label: 'CHARGERS', icon: Zap, link: '/products?category=chargers' },
     { label: 'EARPHONES', icon: Headphones, link: '/products?category=audio' },
     { label: 'CABLES', icon: Cable, link: '/products?category=cables' },
-    { label: 'SCREEN PROTECTORS', icon: Shield, link: '/products?category=screen-protectors' },
+    { label: 'POWER BANKS', icon: BatteryCharging, link: '/products?category=power-banks' },
+    { label: 'MOUNTS & STANDS', icon: Shield, link: '/products?category=stands-mounts' },
   ];
 
   return (

@@ -1,4 +1,5 @@
-// Prisma schema for Mobile Accessories Platform
+// Prisma schema for Mobixia Mobile Accessories Platform
+// Product catalog is served via structured high-performance static dataset (vortique.in products)
 
 generator client {
   provider = "prisma-client-js"
@@ -77,85 +78,6 @@ model Address {
   updatedAt  DateTime @updatedAt
 }
 
-model Category {
-  id          Int        @id @default(autoincrement())
-  parent_id   Int?
-  parent      Category?  @relation("SubCategories", fields: [parent_id], references: [id])
-  children    Category[] @relation("SubCategories")
-  name        String
-  slug        String     @unique
-  image       String?
-  sort_order  Int        @default(0)
-  status      String     @default("ACTIVE") // ACTIVE, INACTIVE
-  is_featured Boolean    @default(false)
-  products    Product[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-}
-
-model Brand {
-  id          Int       @id @default(autoincrement())
-  name        String
-  slug        String    @unique
-  logo        String?
-  description String?
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Product {
-  id             Int              @id @default(autoincrement())
-  category_id    Int
-  category       Category         @relation(fields: [category_id], references: [id])
-  brand_id       Int?
-  brand          Brand?           @relation(fields: [brand_id], references: [id])
-  name           String
-  slug           String           @unique
-  description    String?          @db.Text
-  specs_json     String?          @db.Text // JSON string for technical specifications
-  status         String           @default("ACTIVE") // ACTIVE, INACTIVE, DRAFT
-  is_featured    Boolean          @default(false)
-  is_best_seller Boolean          @default(false)
-  views_count    Int              @default(0)
-  created_by     Int?
-  variants       ProductVariant[]
-  images         ProductImage[]
-  reviews        Review[]
-  wishlists      Wishlist[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-}
-
-model ProductVariant {
-  id            Int          @id @default(autoincrement())
-  product_id    Int
-  product       Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  sku           String       @unique
-  color         String?
-  color_code    String?      // e.g. #000000
-  size_or_model String?      // e.g. iPhone 15 Pro Max, 65W, 10000mAh
-  price         Float
-  mrp           Float
-  stock         Int          @default(0)
-  image         String?
-  cart_items    CartItem[]
-  order_items   OrderItem[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-}
-
-model ProductImage {
-  id         Int      @id @default(autoincrement())
-  product_id Int
-  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  variant_id Int?
-  url        String
-  is_primary Boolean  @default(false)
-  sort_order Int      @default(0)
-  createdAt  DateTime @default(now())
-}
-
 model Cart {
   id         Int        @id @default(autoincrement())
   user_id    Int?       @unique
@@ -166,16 +88,16 @@ model Cart {
 }
 
 model CartItem {
-  id         Int            @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   cart_id    Int
-  cart       Cart           @relation(fields: [cart_id], references: [id], onDelete: Cascade)
-  variant_id Int
-  variant    ProductVariant @relation(fields: [variant_id], references: [id], onDelete: Cascade)
-  qty        Int            @default(1)
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  cart       Cart     @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  product_id Int
+  variant_id Int?
+  qty        Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@unique([cart_id, variant_id])
+  @@unique([cart_id, product_id, variant_id])
 }
 
 model Order {
@@ -212,11 +134,11 @@ model Order {
 }
 
 model OrderItem {
-  id                    Int            @id @default(autoincrement())
+  id                    Int     @id @default(autoincrement())
   order_id              Int
-  order                 Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  order                 Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product_id            Int?
   variant_id            Int?
-  variant               ProductVariant? @relation(fields: [variant_id], references: [id], onDelete: SetNull)
   qty                   Int
   price                 Float
   mrp                   Float?
@@ -236,40 +158,39 @@ model OrderStatusHistory {
 }
 
 model Coupon {
-  id              Int      @id @default(autoincrement())
-  code            String   @unique
-  type            String   @default("PERCENTAGE") // PERCENTAGE, FLAT
+  id              Int       @id @default(autoincrement())
+  code            String    @unique
+  type            String    @default("PERCENTAGE") // PERCENTAGE, FLAT
   value           Float
-  min_order_value Float    @default(0)
+  min_order_value Float     @default(0)
   max_discount    Float?
-  usage_limit     Int      @default(100)
-  used_count      Int      @default(0)
+  usage_limit     Int       @default(100)
+  used_count      Int       @default(0)
   start_date      DateTime?
   end_date        DateTime?
-  status          String   @default("ACTIVE") // ACTIVE, INACTIVE
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  status          String    @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model Banner {
-  id          Int       @id @default(autoincrement())
-  title       String
-  subtitle    String?
-  image       String
-  link        String?
-  position    String    @default("HERO") // HERO, PROMO_TOP, PROMO_STRIP
-  sort_order  Int       @default(0)
-  status      String    @default("ACTIVE") // ACTIVE, INACTIVE
-  start_date  DateTime?
-  end_date    DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         Int       @id @default(autoincrement())
+  title      String
+  subtitle   String?
+  image      String
+  link       String?
+  position   String    @default("HERO") // HERO, PROMO_TOP, PROMO_STRIP
+  sort_order Int       @default(0)
+  status     String    @default("ACTIVE") // ACTIVE, INACTIVE
+  start_date DateTime?
+  end_date   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Review {
   id          Int      @id @default(autoincrement())
   product_id  Int
-  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
   user_id     Int
   user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   order_id    Int?
@@ -289,7 +210,6 @@ model Wishlist {
   user_id    Int
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   product_id Int
-  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 
   @@unique([user_id, product_id])
@@ -341,14 +261,14 @@ model AuditLog {
 }
 
 model ContactEnquiry {
-  id         Int      @id @default(autoincrement())
-  name       String
-  email      String
-  phone      String?
-  subject    String?
-  message    String   @db.Text
-  status     String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  status    String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  createdAt DateTime @default(now())
 }
 
 model NotificationLog {

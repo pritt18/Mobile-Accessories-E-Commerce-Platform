@@ -33,7 +33,7 @@ const submitReview = async (req, res) => {
         status: 'DELIVERED',
         items: {
           some: {
-            variant: { product_id: parseInt(productId) },
+            product_id: parseInt(productId),
           },
         },
       },

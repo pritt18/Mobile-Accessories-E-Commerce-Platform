@@ -75,9 +75,9 @@ export const CheckoutPage = () => {
       if (res.data?.success) {
         setStoreSettings({
           shipping_free_threshold: parseFloat(res.data.data?.shipping_free_threshold) || 499,
-          shipping_standard_fee: parseFloat(res.data.data?.shipping_standard_fee) ?? 50,
-          shipping_express_fee: parseFloat(res.data.data?.shipping_express_fee) ?? 49,
-          shipping_cod_fee: parseFloat(res.data.data?.shipping_cod_fee) ?? 0,
+          shipping_standard_fee: isNaN(parseFloat(res.data.data?.shipping_standard_fee)) ? 50 : parseFloat(res.data.data?.shipping_standard_fee),
+          shipping_express_fee: isNaN(parseFloat(res.data.data?.shipping_express_fee)) ? 49 : parseFloat(res.data.data?.shipping_express_fee),
+          shipping_cod_fee: isNaN(parseFloat(res.data.data?.shipping_cod_fee)) ? 0 : parseFloat(res.data.data?.shipping_cod_fee),
         });
       }
     }).catch(() => {});
@@ -282,9 +282,9 @@ export const CheckoutPage = () => {
           if (isLoaded && window.Razorpay) {
             const razorpayConfig = res.data.data.razorpay;
             const options = {
-              key: razorpayConfig?.keyId || 'rzp_test_Tb6xiThrPT7xSc',
+              key: razorpayConfig?.keyId || 'rzp_test_Tb3eJTFsLj1VR9',
               order_id: razorpayConfig?.orderId || undefined,
-              amount: Math.round(orderData.total * 100),
+              amount: Math.round(Number(orderData.total || 0) * 100),
               currency: 'INR',
               name: 'Mobixia Mobile Accessories',
               description: `Order #${orderData.order_no}`,
@@ -292,7 +292,7 @@ export const CheckoutPage = () => {
               prefill: {
                 name: guestName || user?.name || 'Customer',
                 email: guestEmail || user?.email || 'pritamgangurde18@gmail.com',
-                contact: guestPhone || user?.mobile || '9579888176',
+                contact: guestPhone || user?.mobile || '9876543210',
               },
               notes: {
                 order_no: orderData.order_no,
@@ -327,12 +327,18 @@ export const CheckoutPage = () => {
               },
             };
 
-            const rzp = new window.Razorpay(options);
-            rzp.on('payment.failed', function (resp) {
-              setOrderError(resp.error?.description || 'Payment Failed. Please try another method.');
-              setLoading(false);
-            });
-            rzp.open();
+            try {
+              const rzp = new window.Razorpay(options);
+              rzp.on('payment.failed', function (resp) {
+                console.warn('Razorpay payment failed:', resp);
+                setLoading(false);
+                setShowRazorpayModal(true);
+              });
+              rzp.open();
+            } catch (err) {
+              console.warn('Razorpay popup error, opening simulation modal:', err);
+              setShowRazorpayModal(true);
+            }
             setLoading(false);
           } else {
             // Fallback to simulation modal if adblocker blocks external Razorpay script

@@ -4,10 +4,23 @@ const { generateInvoiceData, generateInvoiceHtml } = require('../utils/invoice')
 const { sendNotification } = require('../utils/mailer');
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
+const products = require('../data/products.json');
+
+const findProductAndVariant = (productId, variantId) => {
+  let product = products.find((p) => p.id === parseInt(productId));
+  let variant = null;
+  if (!product && variantId) {
+    product = products.find((p) => p.variants && p.variants.some((v) => v.id === parseInt(variantId)));
+  }
+  if (product && product.variants && product.variants.length > 0) {
+    variant = product.variants.find((v) => v.id === parseInt(variantId)) || product.variants[0];
+  }
+  return { product, variant };
+};
 
 const getRazorpayConfig = async () => {
-  let keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_Tb6xiThrPT7xSc';
-  let keySecret = process.env.RAZORPAY_KEY_SECRET || 'SR1SPVz7yMiNPmaFx8v1COuk';
+  let keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_Tb3eJTFsLj1VR9';
+  let keySecret = process.env.RAZORPAY_KEY_SECRET || 'M3P24lGMoCy7QsEgPuomqA99';
 
   try {
     const activeSetting = await prisma.setting.findUnique({ where: { key: 'payment_razorpay_mode' } }).catch(() => null);
@@ -16,10 +29,13 @@ const getRazorpayConfig = async () => {
       where: { provider: 'RAZORPAY', mode, is_active: true },
     }).catch(() => null);
 
-    if (cred && cred.key_id && cred.key_secret_encrypted) {
+    if (cred && cred.key_id && !cred.key_id.includes('mobixiaDemo') && cred.key_secret_encrypted) {
       const { decryptSecret } = require('../config/security');
-      keyId = cred.key_id;
-      keySecret = decryptSecret(cred.key_secret_encrypted);
+      const decrypted = decryptSecret(cred.key_secret_encrypted);
+      if (decrypted) {
+        keyId = cred.key_id;
+        keySecret = decrypted;
+      }
     }
   } catch (e) {
     console.warn('[RAZORPAY] Fallback to process.env credentials:', e.message);
@@ -70,50 +86,40 @@ const createOrder = async (req, res) => {
       return errorResponse(res, 'No items specified in the order', 400);
     }
 
-    // Validate and fetch variants
-    const variantIds = items.map((i) => parseInt(i.variantId));
-    const dbVariants = await prisma.productVariant.findMany({
-      where: { id: { in: variantIds } },
-      include: {
-        product: {
-          include: {
-            images: { take: 1, orderBy: { sort_order: 'asc' } },
-          },
-        },
-      },
-    });
-
-    if (dbVariants.length !== items.length) {
-      return errorResponse(res, 'One or more selected products are invalid', 400);
-    }
-
-    // Check stock & calculate subtotal
+    // Validate products and check stock & calculate subtotal
     let subtotal = 0;
     const orderItemsData = [];
 
     for (const item of items) {
-      const variant = dbVariants.find((v) => v.id === parseInt(item.variantId));
-      const qty = parseInt(item.qty);
+      const { product, variant } = findProductAndVariant(item.productId, item.variantId);
+      if (!product) {
+        return errorResponse(res, 'One or more selected products are invalid', 400);
+      }
+      const qty = parseInt(item.qty) || 1;
+      const stock = variant ? variant.stock : (product.stock || 50);
 
-      if (variant.stock < qty) {
+      if (stock < qty) {
         return errorResponse(
           res,
-          `Sorry, "${variant.product.name} (${variant.size_or_model || ''} ${variant.color || ''})" has only ${variant.stock} units left in stock.`,
+          `Sorry, "${product.name}" has only ${stock} units left in stock.`,
           400
         );
       }
 
-      const itemTotal = variant.price * qty;
+      const price = variant ? variant.price : product.price;
+      const mrp = variant ? (variant.mrp || variant.price) : (product.mrp || product.price);
+      const itemTotal = price * qty;
       subtotal += itemTotal;
 
       orderItemsData.push({
-        variant_id: variant.id,
+        product_id: product.id,
+        variant_id: variant ? variant.id : null,
         qty,
-        price: variant.price,
-        mrp: variant.mrp,
-        product_name_snapshot: variant.product.name,
-        variant_snapshot: [variant.color, variant.size_or_model].filter(Boolean).join(' / ') || 'Standard',
-        image_snapshot: variant.image || variant.product.images[0]?.url || '',
+        price,
+        mrp,
+        product_name_snapshot: product.name,
+        variant_snapshot: variant ? [variant.color, variant.model].filter(Boolean).join(' / ') : 'Standard',
+        image_snapshot: (variant && variant.image) || product.primaryImage || (product.images && product.images[0]) || '',
       });
     }
 
@@ -233,13 +239,7 @@ const createOrder = async (req, res) => {
         },
       });
 
-      // 2. Decrement stock for variants
-      for (const item of items) {
-        await tx.productVariant.update({
-          where: { id: parseInt(item.variantId) },
-          data: { stock: { decrement: parseInt(item.qty) } },
-        });
-      }
+
 
       // 3. Update coupon usage count if applied
       if (appliedCoupon) {

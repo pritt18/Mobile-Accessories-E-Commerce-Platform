@@ -1,16 +1,21 @@
 const prisma = require('../../config/db');
 const { successResponse, errorResponse } = require('../../utils/response');
 
+const products = require('../../data/products.json');
+
 const getDashboardStats = async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const lowStockAlertsCount = products.filter(
+      (p) => (p.stock && p.stock <= 5) || (p.variants && p.variants.some((v) => v.stock <= 5))
+    ).length;
+
     const [
       todayOrders,
       totalRevenueResult,
       pendingOrders,
-      lowStockVariants,
       newCustomersToday,
       totalCustomers,
       recentOrders,
@@ -23,7 +28,6 @@ const getDashboardStats = async (req, res) => {
         _sum: { total: true },
       }),
       prisma.order.count({ where: { status: { in: ['PLACED', 'CONFIRMED', 'PACKED'] } } }),
-      prisma.productVariant.count({ where: { stock: { lte: 5 } } }),
       prisma.user.count({
         where: {
           role: { name: 'CUSTOMER' },
@@ -44,7 +48,6 @@ const getDashboardStats = async (req, res) => {
         orderBy: { createdAt: 'desc' },
         include: {
           user: { select: { name: true, avatar: true } },
-          product: { select: { name: true, slug: true } },
         },
       }),
       prisma.order.groupBy({
@@ -77,7 +80,7 @@ const getDashboardStats = async (req, res) => {
         todayOrders,
         totalRevenue: +(totalRevenueResult._sum.total || 48500).toFixed(2),
         pendingOrders,
-        lowStockAlerts: lowStockVariants,
+        lowStockAlerts: lowStockAlertsCount,
         newCustomersToday,
         totalCustomers,
       },
@@ -94,7 +97,13 @@ const getDashboardStats = async (req, res) => {
         placedAt: o.placed_at,
         itemsCount: o.items.length,
       })),
-      recentReviews,
+      recentReviews: recentReviews.map((r) => {
+        const prod = products.find((p) => p.id === r.product_id);
+        return {
+          ...r,
+          product: prod ? { name: prod.name, slug: prod.slug } : { name: 'Accessories Product', slug: 'product' },
+        };
+      }),
     });
   } catch (err) {
     console.error('getDashboardStats error:', err);

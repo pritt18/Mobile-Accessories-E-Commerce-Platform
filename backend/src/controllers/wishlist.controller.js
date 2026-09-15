@@ -1,31 +1,30 @@
 const prisma = require('../config/db');
 const { successResponse, errorResponse } = require('../utils/response');
 
+const products = require('../data/products.json');
+
 const getWishlist = async (req, res) => {
   try {
     const items = await prisma.wishlist.findMany({
       where: { user_id: req.user.id },
-      include: {
-        product: {
-          include: {
-            variants: true,
-            images: { orderBy: { sort_order: 'asc' }, take: 1 },
-          },
-        },
-      },
       orderBy: { createdAt: 'desc' },
     });
 
-    const formatted = items.map((w) => ({
-      id: w.id,
-      productId: w.product_id,
-      name: w.product.name,
-      slug: w.product.slug,
-      price: w.product.variants[0]?.price || 0,
-      mrp: w.product.variants[0]?.mrp || 0,
-      image: w.product.images[0]?.url || w.product.variants[0]?.image || '',
-      inStock: w.product.variants.some((v) => v.stock > 0),
-    }));
+    const formatted = [];
+    for (const w of items) {
+      const prod = products.find((p) => p.id === w.product_id);
+      if (!prod) continue;
+      formatted.push({
+        id: w.id,
+        productId: prod.id,
+        name: prod.name,
+        slug: prod.slug,
+        price: prod.price,
+        mrp: prod.mrp || prod.price,
+        image: prod.primaryImage || (prod.images && prod.images[0]) || '',
+        inStock: prod.inStock !== false,
+      });
+    }
 
     return successResponse(res, formatted);
   } catch (err) {

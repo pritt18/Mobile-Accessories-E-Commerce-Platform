@@ -1,5 +1,19 @@
 const prisma = require('../config/db');
 const { successResponse, errorResponse } = require('../utils/response');
+const products = require('../data/products.json');
+
+// Helper to look up product and variant
+const findProductAndVariant = (productId, variantId) => {
+  let product = products.find((p) => p.id === parseInt(productId));
+  let variant = null;
+  if (!product && variantId) {
+    product = products.find((p) => p.variants && p.variants.some((v) => v.id === parseInt(variantId)));
+  }
+  if (product && product.variants && product.variants.length > 0) {
+    variant = product.variants.find((v) => v.id === parseInt(variantId)) || product.variants[0];
+  }
+  return { product, variant };
+};
 
 // Helper to get or create cart
 const getOrCreateCart = async (userId, sessionId) => {
@@ -21,7 +35,7 @@ const getOrCreateCart = async (userId, sessionId) => {
 const getCart = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const sessionId = req.headers['x-session-id'] || req.query.sessionId;
+    const sessionId = req.headers['x-session-id'] || req.query?.sessionId || req.body?.sessionId;
 
     if (!userId && !sessionId) {
       return successResponse(res, { items: [], subtotal: 0, count: 0 });
@@ -34,35 +48,36 @@ const getCart = async (req, res) => {
 
     const cartItems = await prisma.cartItem.findMany({
       where: { cart_id: cart.id },
-      include: {
-        variant: {
-          include: {
-            product: {
-              include: {
-                images: { orderBy: { sort_order: 'asc' }, take: 1 },
-              },
-            },
-          },
-        },
-      },
+      orderBy: { createdAt: 'desc' },
     });
 
-    const items = cartItems.map((ci) => ({
-      id: ci.id,
-      variantId: ci.variant_id,
-      qty: ci.qty,
-      name: ci.variant.product.name,
-      slug: ci.variant.product.slug,
-      sku: ci.variant.sku,
-      color: ci.variant.color,
-      colorCode: ci.variant.color_code,
-      model: ci.variant.size_or_model,
-      price: ci.variant.price,
-      mrp: ci.variant.mrp,
-      stock: ci.variant.stock,
-      image: ci.variant.image || ci.variant.product.images[0]?.url || '',
-      itemTotal: ci.qty * ci.variant.price,
-    }));
+    const items = [];
+    for (const ci of cartItems) {
+      const { product, variant } = findProductAndVariant(ci.product_id, ci.variant_id);
+      if (!product) continue;
+
+      const price = variant ? variant.price : product.price;
+      const mrp = variant ? (variant.mrp || variant.price) : (product.mrp || product.price);
+      const image = (variant && variant.image) || product.primaryImage || (product.images && product.images[0]) || '';
+      const stock = variant ? variant.stock : (product.stock || 50);
+
+      items.push({
+        id: ci.id,
+        productId: product.id,
+        variantId: variant ? variant.id : null,
+        qty: ci.qty,
+        name: product.name,
+        slug: product.slug,
+        sku: variant ? variant.sku : `VOR-${product.id}`,
+        color: variant ? variant.color : null,
+        model: variant ? variant.model : null,
+        price,
+        mrp,
+        stock,
+        image,
+        itemTotal: +(ci.qty * price).toFixed(2),
+      });
+    }
 
     const subtotal = items.reduce((acc, it) => acc + it.itemTotal, 0);
     const count = items.reduce((acc, it) => acc + it.qty, 0);
@@ -81,23 +96,22 @@ const getCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    const { variantId, qty = 1 } = req.body;
+    const { variantId, productId, qty = 1 } = req.body;
     const userId = req.user?.id;
     const sessionId = req.headers['x-session-id'] || req.body.sessionId;
 
-    if (!variantId) {
-      return errorResponse(res, 'Variant ID is required', 400);
+    if (!productId && !variantId) {
+      return errorResponse(res, 'Product ID or Variant ID is required', 400);
     }
 
-    const variant = await prisma.productVariant.findUnique({
-      where: { id: parseInt(variantId) },
-    });
-    if (!variant) {
-      return errorResponse(res, 'Product variant not found', 404);
+    const { product, variant } = findProductAndVariant(productId, variantId);
+    if (!product) {
+      return errorResponse(res, 'Product not found', 404);
     }
 
-    if (variant.stock < qty) {
-      return errorResponse(res, `Only ${variant.stock} units available in stock`, 400);
+    const effectiveStock = variant ? variant.stock : (product.stock || 50);
+    if (effectiveStock < qty) {
+      return errorResponse(res, `Only ${effectiveStock} units available in stock`, 400);
     }
 
     const cart = await getOrCreateCart(userId, sessionId);
@@ -105,19 +119,18 @@ const addToCart = async (req, res) => {
       return errorResponse(res, 'Unable to create shopping cart', 500);
     }
 
-    const existingItem = await prisma.cartItem.findUnique({
+    const existingItem = await prisma.cartItem.findFirst({
       where: {
-        cart_id_variant_id: {
-          cart_id: cart.id,
-          variant_id: variant.id,
-        },
+        cart_id: cart.id,
+        product_id: product.id,
+        variant_id: variant ? variant.id : null,
       },
     });
 
     if (existingItem) {
       const newQty = existingItem.qty + parseInt(qty);
-      if (newQty > variant.stock) {
-        return errorResponse(res, `Cannot add more. Stock limit (${variant.stock}) reached.`, 400);
+      if (newQty > effectiveStock) {
+        return errorResponse(res, `Cannot add more. Stock limit (${effectiveStock}) reached.`, 400);
       }
       await prisma.cartItem.update({
         where: { id: existingItem.id },
@@ -127,7 +140,8 @@ const addToCart = async (req, res) => {
       await prisma.cartItem.create({
         data: {
           cart_id: cart.id,
-          variant_id: variant.id,
+          product_id: product.id,
+          variant_id: variant ? variant.id : null,
           qty: parseInt(qty),
         },
       });
@@ -152,14 +166,16 @@ const updateCartItem = async (req, res) => {
 
     const cartItem = await prisma.cartItem.findUnique({
       where: { id: parseInt(id) },
-      include: { variant: true },
     });
     if (!cartItem) {
       return errorResponse(res, 'Cart item not found', 404);
     }
 
-    if (cartItem.variant.stock < qty) {
-      return errorResponse(res, `Only ${cartItem.variant.stock} units available in stock`, 400);
+    const { product, variant } = findProductAndVariant(cartItem.product_id, cartItem.variant_id);
+    const stock = variant ? variant.stock : (product ? product.stock : 50);
+
+    if (stock < qty) {
+      return errorResponse(res, `Only ${stock} units available in stock`, 400);
     }
 
     await prisma.cartItem.update({

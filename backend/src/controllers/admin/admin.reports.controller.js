@@ -33,27 +33,42 @@ const getSalesReport = async (req, res) => {
   }
 };
 
+const products = require('../../data/products.json');
+
 const getInventoryReport = async (req, res) => {
   try {
-    const variants = await prisma.productVariant.findMany({
-      include: {
-        product: { select: { name: true, slug: true, category: { select: { name: true } } } },
-      },
-      orderBy: { stock: 'asc' },
-    });
+    const formatted = [];
+    for (const p of products) {
+      if (p.variants && p.variants.length > 0) {
+        for (const v of p.variants) {
+          formatted.push({
+            id: v.id,
+            productName: p.name,
+            category: p.category ? p.category.replace('-', ' ').toUpperCase() : 'Accessories',
+            sku: v.sku || `VOR-${p.id}`,
+            variantName: [v.color, v.model].filter(Boolean).join(' / ') || 'Standard',
+            price: v.price,
+            mrp: v.mrp || v.price,
+            stock: v.stock || 50,
+            status: (v.stock || 50) === 0 ? 'OUT_OF_STOCK' : (v.stock || 50) <= 5 ? 'LOW_STOCK' : 'IN_STOCK',
+          });
+        }
+      } else {
+        formatted.push({
+          id: p.id,
+          productName: p.name,
+          category: p.category ? p.category.replace('-', ' ').toUpperCase() : 'Accessories',
+          sku: `VOR-${p.id}`,
+          variantName: 'Standard',
+          price: p.price,
+          mrp: p.mrp || p.price,
+          stock: p.stock || 50,
+          status: (p.stock || 50) === 0 ? 'OUT_OF_STOCK' : (p.stock || 50) <= 5 ? 'LOW_STOCK' : 'IN_STOCK',
+        });
+      }
+    }
 
-    const formatted = variants.map((v) => ({
-      id: v.id,
-      productName: v.product.name,
-      category: v.product.category.name,
-      sku: v.sku,
-      variantName: [v.color, v.size_or_model].filter(Boolean).join(' / ') || 'Standard',
-      price: v.price,
-      mrp: v.mrp,
-      stock: v.stock,
-      status: v.stock === 0 ? 'OUT_OF_STOCK' : v.stock <= 5 ? 'LOW_STOCK' : 'IN_STOCK',
-    }));
-
+    formatted.sort((a, b) => a.stock - b.stock);
     return successResponse(res, formatted);
   } catch (err) {
     return errorResponse(res, err.message, 500);

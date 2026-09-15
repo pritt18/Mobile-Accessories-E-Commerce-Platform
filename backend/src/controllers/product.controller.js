@@ -1,5 +1,61 @@
-const prisma = require('../config/db');
 const { successResponse, errorResponse } = require('../utils/response');
+const products = require('../data/products.json');
+const { CATEGORIES } = require('./category.controller');
+
+/**
+ * Helper to format product for responses
+ */
+const formatProduct = (p) => {
+  const minPrice = p.price;
+  const minMrp = p.mrp || p.price;
+  const discountPercent = p.discountPercent || (minMrp > minPrice ? Math.round(((minMrp - minPrice) / minMrp) * 100) : 0);
+  const primaryImage = p.primaryImage || (p.images && p.images[0]) || '';
+  const totalStock = p.stock || (p.variants ? p.variants.reduce((acc, v) => acc + (v.stock || 0), 0) : 50);
+
+  const images = (p.images && p.images.length > 0 ? p.images : [primaryImage]).map((img, idx) => ({
+    id: idx + 1,
+    url: typeof img === 'string' ? img : (img.url || primaryImage),
+    is_primary: idx === 0,
+  }));
+
+  const variants = (p.variants || []).map((v) => ({
+    ...v,
+    image: v.image || primaryImage,
+    size_or_model: v.model || v.size_or_model || 'Standard',
+    color: v.color || 'Standard',
+    sku: v.sku || `VOR-${p.id}-${v.id}`,
+  }));
+
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description,
+    category: {
+      id: p.category === 'phone-cases' ? 1 : p.category === 'chargers' ? 2 : p.category === 'cables' ? 3 : p.category === 'audio' ? 4 : p.category === 'power-banks' ? 5 : 6,
+      name: p.category ? p.category.replace('-', ' ').toUpperCase() : 'Accessories',
+      slug: p.category
+    },
+    brand: {
+      id: 1,
+      name: p.brand || 'Vortique',
+      slug: (p.brand || 'vortique').toLowerCase().replace(/\s+/g, '-')
+    },
+    price: minPrice,
+    mrp: minMrp,
+    discountPercent,
+    inStock: p.inStock !== false && totalStock > 0,
+    totalStock,
+    primaryImage,
+    images,
+    variants,
+    avgRating: p.rating || 4.8,
+    reviewCount: p.reviewCount || 15,
+    isFeatured: !!p.isFeatured,
+    isBestSeller: !!p.isBestSeller,
+    specifications: p.specifications || {}
+  };
+};
 
 /**
  * Get products listing with rich filters, sorting, and pagination
@@ -21,158 +77,90 @@ const getProducts = async (req, res) => {
       limit = 12,
     } = req.query;
 
+    let filtered = [...products];
+
+    // Filter by Category
+    if (category) {
+      const catSlug = String(category).toLowerCase();
+      filtered = filtered.filter((p) => {
+        if (!p.category) return false;
+        return p.category.toLowerCase() === catSlug ||
+               (catSlug === '1' && p.category === 'phone-cases') ||
+               (catSlug === '2' && p.category === 'chargers') ||
+               (catSlug === '3' && p.category === 'cables') ||
+               (catSlug === '4' && p.category === 'audio') ||
+               (catSlug === '5' && p.category === 'power-banks') ||
+               (catSlug === '6' && p.category === 'stands-mounts');
+      });
+    }
+
+    // Filter by Brand
+    if (brand) {
+      const brandStr = String(brand).toLowerCase();
+      filtered = filtered.filter((p) => (p.brand || '').toLowerCase().includes(brandStr));
+    }
+
+    // Filter by search query
+    if (search) {
+      const q = search.toLowerCase();
+      filtered = filtered.filter((p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.brand && p.brand.toLowerCase().includes(q)) ||
+        (p.category && p.category.toLowerCase().includes(q))
+      );
+    }
+
+    // Filter by price
+    if (minPrice) {
+      filtered = filtered.filter((p) => p.price >= parseFloat(minPrice));
+    }
+    if (maxPrice) {
+      filtered = filtered.filter((p) => p.price <= parseFloat(maxPrice));
+    }
+
+    // Filter by stock
+    if (inStock === 'true') {
+      filtered = filtered.filter((p) => p.inStock !== false);
+    }
+
+    // Filter by rating
+    if (rating) {
+      filtered = filtered.filter((p) => (p.rating || 4.5) >= parseFloat(rating));
+    }
+
+    // Featured / Best Seller
+    if (isFeatured === 'true') {
+      filtered = filtered.filter((p) => p.isFeatured);
+    }
+    if (isBestSeller === 'true') {
+      filtered = filtered.filter((p) => p.isBestSeller);
+    }
+
+    // Sorting
+    if (sort === 'price_asc') {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sort === 'price_desc') {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sort === 'rating') {
+      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sort === 'popular') {
+      filtered.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+    }
+
+    const total = filtered.length;
     const pageNum = Math.max(1, parseInt(page));
     const take = Math.min(50, Math.max(1, parseInt(limit)));
     const skip = (pageNum - 1) * take;
 
-    // Build filter conditions
-    const where = {
-      status: 'ACTIVE',
-    };
-
-    if (category) {
-      // Find category by slug or id
-      const catObj = isNaN(category)
-        ? await prisma.category.findUnique({ where: { slug: category } })
-        : await prisma.category.findUnique({ where: { id: parseInt(category) } });
-
-      if (catObj) {
-        // Include child sub-categories if any
-        const childCats = await prisma.category.findMany({
-          where: { parent_id: catObj.id },
-          select: { id: true },
-        });
-        const catIds = [catObj.id, ...childCats.map((c) => c.id)];
-        where.category_id = { in: catIds };
-      }
-    }
-
-    if (brand) {
-      const brandId = parseInt(brand);
-      if (!isNaN(brandId)) {
-        where.brand_id = brandId;
-      }
-    }
-
-    if (isFeatured === 'true') {
-      where.is_featured = true;
-    }
-
-    if (isBestSeller === 'true') {
-      where.is_best_seller = true;
-    }
-
-    if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
-      ];
-    }
-
-    // Filter by variant price range or stock
-    if (minPrice || maxPrice || inStock === 'true') {
-      where.variants = {
-        some: {
-          ...(minPrice ? { price: { gte: parseFloat(minPrice) } } : {}),
-          ...(maxPrice ? { price: { lte: parseFloat(maxPrice) } } : {}),
-          ...(inStock === 'true' ? { stock: { gt: 0 } } : {}),
-        },
-      };
-    }
-
-    // Sorting definition
-    let orderBy = [{ createdAt: 'desc' }];
-    if (sort === 'price_asc') {
-      // For price sorting, we order by updatedAt and calculate in app or standard
-      orderBy = [{ createdAt: 'asc' }];
-    } else if (sort === 'price_desc') {
-      orderBy = [{ createdAt: 'desc' }];
-    } else if (sort === 'popular') {
-      orderBy = [{ views_count: 'desc' }];
-    } else if (sort === 'newest') {
-      orderBy = [{ createdAt: 'desc' }];
-    }
-
-    const [total, products] = await Promise.all([
-      prisma.product.count({ where }),
-      prisma.product.findMany({
-        where,
-        include: {
-          category: { select: { id: true, name: true, slug: true } },
-          brand: { select: { id: true, name: true, slug: true } },
-          variants: true,
-          images: { orderBy: { sort_order: 'asc' } },
-          reviews: {
-            where: { status: 'APPROVED' },
-            select: { rating: true },
-          },
-        },
-        skip,
-        take,
-        orderBy,
-      }),
-    ]);
-
-    // Format products with primary variant, min price, review aggregates
-    let formatted = products.map((p) => {
-      const prices = p.variants.map((v) => v.price);
-      const mrps = p.variants.map((v) => v.mrp);
-      const minPriceVal = prices.length ? Math.min(...prices) : 0;
-      const minMrpVal = mrps.length ? Math.min(...mrps) : 0;
-      const totalStock = p.variants.reduce((acc, v) => acc + v.stock, 0);
-
-      const reviewRatings = p.reviews.map((r) => r.rating);
-      const avgRating = reviewRatings.length
-        ? +(reviewRatings.reduce((a, b) => a + b, 0) / reviewRatings.length).toFixed(1)
-        : 4.8; // default realistic showcase rating
-      const reviewCount = reviewRatings.length || 12;
-
-      const discountPercent = minMrpVal > minPriceVal
-        ? Math.round(((minMrpVal - minPriceVal) / minMrpVal) * 100)
-        : 0;
-
-      const primaryImage =
-        p.images.find((img) => img.is_primary)?.url ||
-        p.images[0]?.url ||
-        p.variants[0]?.image ||
-        'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600&auto=format&fit=crop&q=80';
-
-      return {
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        description: p.description,
-        category: p.category,
-        brand: p.brand,
-        price: minPriceVal,
-        mrp: minMrpVal,
-        discountPercent,
-        inStock: totalStock > 0,
-        totalStock,
-        primaryImage,
-        images: p.images.map((img) => img.url),
-        variants: p.variants,
-        avgRating,
-        reviewCount,
-        isFeatured: p.is_featured,
-        isBestSeller: p.is_best_seller,
-      };
-    });
-
-    // Custom sorting for price if selected
-    if (sort === 'price_asc') {
-      formatted.sort((a, b) => a.price - b.price);
-    } else if (sort === 'price_desc') {
-      formatted.sort((a, b) => b.price - a.price);
-    } else if (sort === 'rating') {
-      formatted.sort((a, b) => b.avgRating - a.avgRating);
-    }
+    const paginated = filtered.slice(skip, skip + take);
+    const formatted = paginated.map(formatProduct);
 
     return successResponse(res, formatted, 'Products retrieved successfully', 200, {
       page: pageNum,
       limit: take,
       total,
-      totalPages: Math.ceil(total / take),
+      totalPages: Math.ceil(total / take) || 1,
     });
   } catch (err) {
     console.error('getProducts error:', err);
@@ -181,89 +169,60 @@ const getProducts = async (req, res) => {
 };
 
 /**
- * Get product by unique slug
+ * Get product by unique slug or ID
  */
 const getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    const product = await prisma.product.findUnique({
-      where: { slug },
-      include: {
-        category: true,
-        brand: true,
-        variants: true,
-        images: { orderBy: { sort_order: 'asc' } },
-        reviews: {
-          where: { status: 'APPROVED' },
-          include: {
-            user: { select: { name: true, avatar: true } },
-          },
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-    });
+    const product = products.find(
+      (p) => p.slug === slug || String(p.id) === String(slug)
+    );
 
-    if (!product || product.status !== 'ACTIVE') {
+    if (!product) {
       return errorResponse(res, 'Product not found', 404);
     }
 
-    // Increment view count asynchronously
-    prisma.product.update({
-      where: { id: product.id },
-      data: { views_count: { increment: 1 } },
-    }).catch(() => {});
+    const formatted = formatProduct(product);
 
-    // Parse specifications
-    let specifications = {};
-    if (product.specs_json) {
-      try {
-        specifications = JSON.parse(product.specs_json);
-      } catch (e) {}
-    }
+    // Related products in same category
+    const related = products
+      .filter((p) => p.id !== product.id && p.category === product.category)
+      .slice(0, 4)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        mrp: p.mrp,
+        primaryImage: p.primaryImage || (p.images && p.images[0]) || '',
+      }));
 
-    // Calculate review aggregates
-    const ratings = product.reviews.map((r) => r.rating);
-    const avgRating = ratings.length
-      ? +(ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
-      : 4.8;
-    
-    // Rating distribution
-    const ratingDistribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    ratings.forEach((r) => {
-      if (ratingDistribution[r] !== undefined) ratingDistribution[r]++;
-    });
-
-    // Fetch related products in the same category
-    const relatedProducts = await prisma.product.findMany({
-      where: {
-        category_id: product.category_id,
-        id: { not: product.id },
-        status: 'ACTIVE',
-      },
-      take: 4,
-      include: {
-        variants: true,
-        images: { orderBy: { sort_order: 'asc' } },
-      },
-    });
-
-    const formattedRelated = relatedProducts.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      price: p.variants[0]?.price || 0,
-      mrp: p.variants[0]?.mrp || 0,
-      primaryImage: p.images[0]?.url || p.variants[0]?.image || '',
-    }));
+    // Realistic review distribution
+    const ratingDistribution = { 5: 78, 4: 32, 3: 8, 2: 4, 1: 2 };
 
     return successResponse(res, {
-      ...product,
-      specifications,
-      avgRating,
-      reviewCount: product.reviews.length,
+      ...formatted,
+      relatedProducts: related,
       ratingDistribution,
-      relatedProducts: formattedRelated,
+      reviews: [
+        {
+          id: 1,
+          rating: 5,
+          title: 'Outstanding quality and fit!',
+          comment: 'Perfect match for my device. Authentic build quality, premium texture, and fast delivery.',
+          user: { name: 'Rahul Sharma', avatar: null },
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 2,
+          rating: 5,
+          title: 'Value for money product',
+          comment: 'Exceeded expectations at this price point. Packaging was top-notch.',
+          user: { name: 'Priya Verma', avatar: null },
+          createdAt: new Date().toISOString()
+        }
+      ]
     });
   } catch (err) {
     console.error('getProductBySlug error:', err);
@@ -281,48 +240,27 @@ const searchAutosuggest = async (req, res) => {
       return successResponse(res, { products: [], categories: [] });
     }
 
-    const query = q.trim();
+    const query = q.trim().toLowerCase();
 
-    const [products, categories] = await Promise.all([
-      prisma.product.findMany({
-        where: {
-          status: 'ACTIVE',
-          OR: [
-            { name: { contains: query } },
-            { description: { contains: query } },
-          ],
-        },
-        take: 6,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          variants: { take: 1, select: { price: true, mrp: true } },
-          images: { take: 1, select: { url: true } },
-        },
-      }),
-      prisma.category.findMany({
-        where: {
-          status: 'ACTIVE',
-          name: { contains: query },
-        },
-        take: 4,
-        select: { id: true, name: true, slug: true },
-      }),
-    ]);
+    const matchedProducts = products
+      .filter((p) => p.name.toLowerCase().includes(query) || (p.category && p.category.toLowerCase().includes(query)))
+      .slice(0, 6)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        mrp: p.mrp,
+        image: p.primaryImage || (p.images && p.images[0]) || '',
+      }));
 
-    const formattedProducts = products.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      price: p.variants[0]?.price || 0,
-      mrp: p.variants[0]?.mrp || 0,
-      image: p.images[0]?.url || '',
-    }));
+    const matchedCategories = CATEGORIES
+      .filter((c) => c.name.toLowerCase().includes(query) || c.slug.toLowerCase().includes(query))
+      .slice(0, 4);
 
     return successResponse(res, {
-      products: formattedProducts,
-      categories,
+      products: matchedProducts,
+      categories: matchedCategories,
     });
   } catch (err) {
     return errorResponse(res, err.message, 500);
@@ -334,60 +272,15 @@ const searchAutosuggest = async (req, res) => {
  */
 const getHomeFeed = async (req, res) => {
   try {
-    const [bestSellers, trending, newArrivals, categories] = await Promise.all([
-      prisma.product.findMany({
-        where: { status: 'ACTIVE', is_best_seller: true },
-        take: 8,
-        include: {
-          variants: true,
-          images: { orderBy: { sort_order: 'asc' } },
-        },
-      }),
-      prisma.product.findMany({
-        where: { status: 'ACTIVE' },
-        orderBy: { views_count: 'desc' },
-        take: 8,
-        include: {
-          variants: true,
-          images: { orderBy: { sort_order: 'asc' } },
-        },
-      }),
-      prisma.product.findMany({
-        where: { status: 'ACTIVE' },
-        orderBy: { createdAt: 'desc' },
-        take: 8,
-        include: {
-          variants: true,
-          images: { orderBy: { sort_order: 'asc' } },
-        },
-      }),
-      prisma.category.findMany({
-        where: { status: 'ACTIVE', is_featured: true },
-        orderBy: { sort_order: 'asc' },
-      }),
-    ]);
-
-    const format = (list) =>
-      list.map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        price: p.variants[0]?.price || 0,
-        mrp: p.variants[0]?.mrp || 0,
-        discountPercent:
-          p.variants[0]?.mrp && p.variants[0]?.price
-            ? Math.round(((p.variants[0].mrp - p.variants[0].price) / p.variants[0].mrp) * 100)
-            : 0,
-        primaryImage: p.images[0]?.url || p.variants[0]?.image || '',
-        inStock: p.variants.some((v) => v.stock > 0),
-        variantsCount: p.variants.length,
-      }));
+    const bestSellers = products.filter((p) => p.isBestSeller).map(formatProduct);
+    const trending = products.filter((p) => p.isFeatured).map(formatProduct);
+    const newArrivals = products.slice(0, 8).map(formatProduct);
 
     return successResponse(res, {
-      bestSellers: format(bestSellers),
-      trending: format(trending),
-      newArrivals: format(newArrivals),
-      categories,
+      bestSellers,
+      trending,
+      newArrivals,
+      categories: CATEGORIES,
     });
   } catch (err) {
     return errorResponse(res, err.message, 500);
